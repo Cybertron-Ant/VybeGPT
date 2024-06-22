@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 //  'MaterialApp' widget as the root
 void main() => runApp(MaterialApp(
 
+  debugShowCheckedModeBanner: false,
+
   // set 'NinjaCard' widget as the home screen
   // means 'NinjaCard' will be the first screen shown in the app
   home: NinjaCard(),
