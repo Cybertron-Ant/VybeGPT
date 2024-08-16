@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "517883933280",
+    "project_id": "one-firebase-4266a",
+    "storage_bucket": "one-firebase-4266a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517883933280:android:8b8ea1cf74af4c4845c905",
+        "android_client_info": {
+          "package_name": "com.kaibacorp.firebasetest43"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ay_dC8xHzcTSq8LlGtsPjdUjfYBVx7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517883933280-vakii96dr5cimd2c51j2r4762ieem2qj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kaibacorp.firebasetest"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517883933280:android:a5ea240cc471824845c905",
+        "android_client_info": {
+          "package_name": "com.kaibacorp.towers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ay_dC8xHzcTSq8LlGtsPjdUjfYBVx7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517883933280-vakii96dr5cimd2c51j2r4762ieem2qj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kaibacorp.firebasetest"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,23 +1,42 @@
 import 'package:flutter/material.dart';
-import 'stateless_template.dart'; // import the 'StatelessTemplate' widget
+import 'package:provider/provider.dart';
+import 'package:towers/components/login_system/constants/strings.dart';
+import 'package:towers/components/login_system/user_authentication/log_out/providers/log_out_provider.dart';
+import 'login_system/user_authentication/login_state/authentication_state.dart';
 
 
+// 'MyApp' widget, a 'StatelessWidget' representing the root of the application
 class MyApp extends StatelessWidget {
-  // constructor for 'MyApp', with a 'key' parameter for widget identification
   const MyApp({super.key});
+
 
   // Override 'build' method to describe part of user interface represented by this widget
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
 
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
 
-      // set 'StatelessTemplate' widget as the home screen
-      // means 'StatelessTemplate' will be the first screen shown in the app
-      home: StatelessTemplate(),
+      providers: [
 
+        // provide 'LogOutProvider' globally available to the entire app
+        ChangeNotifierProvider(create: (_) => LogOutProvider()),
+
+      ], // end 'providers' array
+
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+
+        title: Strings.brandName,
+
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+
+        home: const AuthenticationState(),
+
+      ),
     );
+
   } // end 'build' overridden method
 
-} // end 'MyApp' class
+} // end 'MyApp' widget class
