@@ -38,206 +38,214 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: SingleChildScrollView(
 
-          child: Form(
-            key: _formKey, // assign form key
+          child: LayoutBuilder( // 'LayoutBuilder' to handle responsiveness
+            builder: (context, constraints) {
+              double cardWidth = constraints.maxWidth < 600
+                  ? constraints.maxWidth * 0.9 // 90% width for small screens
+                  : 500; // fixed width for larger screens
 
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // center column children
+              return Form(
+                key: _formKey, // assign form key
 
-              children: <Widget>[
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center, // center column children
 
-                const Text(
-                  Strings.brandName, // login screen title from constants
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: AppColors.white), // text style
-                ),
+                  children: <Widget>[
 
-                const SizedBox(height: 20), // add space
-
-                // Login Card
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for card
-
-                  child: Card(
-                    elevation: 8, // card elevation
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15), // card border radius
+                    const Text(
+                      Strings.brandName, // login screen title from constants
+                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: AppColors.white), // text style
                     ),
 
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0), // padding inside card
+                    const SizedBox(height: 20), // add space
 
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min, // card size
+                    // Login Card
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: (constraints.maxWidth - cardWidth) / 2), // padding for card
 
-                        children: <Widget>[
+                      child: Card(
+                        elevation: 8, // card elevation
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15), // card border radius
+                        ),
 
-                          TextFormField(
-                            controller: _loginController.emailController, // email controller
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0), // padding inside card
 
-                            decoration: InputDecoration(
-                              hintText: Strings.emailHint, // hint text for email
-                              prefixIcon: const Icon(Icons.email), // icon for email
-                              filled: true, // fill the field
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30), // border radius
-                              ),
-                            ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min, // card size
 
-                            validator: FormValidator.validateEmail, // email validation
+                            children: <Widget>[
 
-                          ),
+                              TextFormField(
+                                controller: _loginController.emailController, // email controller
 
-                          const SizedBox(height: 10), // add space
-
-                          TextFormField(
-                            controller: _loginController.passwordController, // password controller
-
-                            obscureText: true, // obscure password text
-                            decoration: InputDecoration(
-                              hintText: Strings.passwordHint, // hint text for password
-                              prefixIcon: const Icon(Icons.lock), // icon for password
-                              filled: true, // fill the field
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30), // border radius
-                              ),
-                            ),
-
-                            validator: FormValidator.validatePassword, // password validation
-
-                          ),
-
-                          const SizedBox(height: 10), // add space
-
-                          Align(
-                            alignment: Alignment.centerRight, // align to the right
-
-                            child: GestureDetector(
-                              onTap: () {
-                                ForgotPasswordDialog.showForgotPasswordDialog(
-                                    context, _loginController.emailController.text); // show forgot password dialog
-                              },
-
-                              child: const Text(
-                                Strings.forgotPassword, // text for forgot password
-                                style: TextStyle(
-                                  color: AppColors.blue, // blue text color
-                                  decoration: TextDecoration.underline, // underline text
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 20), // add space
-
-                          SizedBox(
-                            width: double.infinity, // make button full width
-
-                            child: ElevatedButton(
-                              onPressed: _loginController.isLoading ? null : () => _login(context), // handle button press
-
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: AppColors.white, // text color
-                                backgroundColor: AppColors.blue, // background color
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30), // button border radius
-                                ),
-                              ),
-
-                              child: _loginController.isLoading
-                                  ? const CircularProgressIndicator(color: AppColors.white) // show progress indicator if loading
-                                  : const Text(Strings.login), // button text
-                            ),
-                          ),
-
-                          const SizedBox(height: 10), // add space
-
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignUpPage(), // navigate to sign up page
-                                ),
-                              );
-                            },
-
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center, // center row children
-
-                              children: <Widget>[
-                                Text(
-                                  Strings.dontHaveAccount, // text for no account
-                                  style: TextStyle(color: AppColors.black), // text color
-                                ),
-
-                                Text(
-                                  Strings.createAccount, // text for create account
-                                  style: TextStyle(
-                                    color: AppColors.blue, // blue text color
-                                    fontWeight: FontWeight.bold, // bold text
-                                    decoration: TextDecoration.underline, // underline text
+                                decoration: InputDecoration(
+                                  hintText: Strings.emailHint, // hint text for email
+                                  prefixIcon: const Icon(Icons.email), // icon for email
+                                  filled: true, // fill the field
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // border radius
                                   ),
                                 ),
 
-                              ],
+                                validator: FormValidator.validateEmail, // email validation
 
-                            ),
+                              ),
+
+                              const SizedBox(height: 10), // add space
+
+                              TextFormField(
+                                controller: _loginController.passwordController, // password controller
+
+                                obscureText: true, // obscure password text
+                                decoration: InputDecoration(
+                                  hintText: Strings.passwordHint, // hint text for password
+                                  prefixIcon: const Icon(Icons.lock), // icon for password
+                                  filled: true, // fill the field
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30), // border radius
+                                  ),
+                                ),
+
+                                validator: FormValidator.validatePassword, // password validation
+
+                              ),
+
+                              const SizedBox(height: 10), // add space
+
+                              Align(
+                                alignment: Alignment.centerRight, // align to the right
+
+                                child: GestureDetector(
+                                  onTap: () {
+                                    ForgotPasswordDialog.showForgotPasswordDialog(
+                                        context, _loginController.emailController.text); // show forgot password dialog
+                                  },
+
+                                  child: const Text(
+                                    Strings.forgotPassword, // text for forgot password
+                                    style: TextStyle(
+                                      color: AppColors.blue, // blue text color
+                                      decoration: TextDecoration.underline, // underline text
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 20), // add space
+
+                              SizedBox(
+                                width: double.infinity, // make button full width
+
+                                child: ElevatedButton(
+                                  onPressed: _loginController.isLoading ? null : () => _login(context), // handle button press
+
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: AppColors.white, // text color
+                                    backgroundColor: AppColors.blue, // background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30), // button border radius
+                                    ),
+                                  ),
+
+                                  child: _loginController.isLoading
+                                      ? const CircularProgressIndicator(color: AppColors.white) // show progress indicator if loading
+                                      : const Text(Strings.login), // button text
+                                ),
+                              ),
+
+                              const SizedBox(height: 10), // add space
+
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SignUpPage(), // navigate to sign up page
+                                    ),
+                                  );
+                                },
+
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center, // center row children
+
+                                  children: <Widget>[
+                                    Text(
+                                      Strings.dontHaveAccount, // text for no account
+                                      style: TextStyle(color: AppColors.black), // text color
+                                    ),
+
+                                    Text(
+                                      Strings.createAccount, // text for create account
+                                      style: TextStyle(
+                                        color: AppColors.blue, // blue text color
+                                        fontWeight: FontWeight.bold, // bold text
+                                        decoration: TextDecoration.underline, // underline text
+                                      ),
+                                    ),
+
+                                  ],
+
+                                ),
+                              ),
+
+                            ],
+
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20), // add space
+
+                    // "Sign in with" text
+                    const Text(
+                      Strings.orSignInWith, // text for sign in options
+                      style: TextStyle(color: AppColors.white, fontSize: 16), // text style
+                    ),
+
+                    const SizedBox(height: 10), // add space
+
+                    // Google Sign-In Button
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
+
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          // TODO: Implement Google sign-in functionality
+                        },
+
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: AppColors.black, // text color
+                          backgroundColor: AppColors.white, // background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30), // button border radius
                           ),
 
-                        ],
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20), // padding inside button
+
+                        ),
+
+                        icon: Image.asset(
+                          Assets.googleLogo, // google logo asset
+                          height: 24, // google logo height
+                          width: 24, // google logo width
+                        ),
+
+                        label: const Text(
+                          Strings.signInWithGoogle, // text for google sign in
+                          style: TextStyle(fontSize: 16), // text style
+                        ),
 
                       ),
                     ),
-                  ),
+
+                  ],
+
                 ),
-
-                const SizedBox(height: 20), // add space
-
-                // "Sign in with" text
-                const Text(
-                  Strings.orSignInWith, // text for sign in options
-                  style: TextStyle(color: AppColors.white, fontSize: 16), // text style
-                ),
-
-                const SizedBox(height: 10), // add space
-
-                // Google Sign-In Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
-
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Implement Google sign-in functionality
-                    },
-
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: AppColors.black, // text color
-                      backgroundColor: AppColors.white, // background color
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30), // button border radius
-                      ),
-
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20), // padding inside button
-
-                    ),
-
-                    icon: Image.asset(
-                      Assets.googleLogo, // google logo asset
-                      height: 24, // google logo height
-                      width: 24, // google logo width
-                    ),
-
-                    label: const Text(
-                      Strings.signInWithGoogle, // text for google sign in
-                      style: TextStyle(fontSize: 16), // text style
-                    ),
-
-                  ),
-                ),
-
-              ],
-
-            ),
+              );
+            },
           ),
         ),
       ),

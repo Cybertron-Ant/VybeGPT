@@ -4,7 +4,6 @@ import 'package:towers/components/login_system/constants/assets.dart';  // impor
 import 'package:towers/components/login_system/constants/strings.dart';
 import 'package:towers/components/login_system/user_authentication/screen_logics/signup_logic.dart';  // import signup logic for handling sign up process
 
-
 class SignUpPage extends StatefulWidget {  // define a stateful widget for the signup page
   const SignUpPage({super.key});  // constructor for the signup page
 
@@ -60,117 +59,136 @@ class _SignUpPageState extends State<SignUpPage> {  // define the state for the 
 
                 const SizedBox(height: 20),  // add vertical spacing after the row
 
-                Padding(  // add padding around the card
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),  // symmetric padding horizontally
+                LayoutBuilder(  // use LayoutBuilder to get the constraints for responsive design
+                  builder: (context, constraints) {
+                    double cardWidth = constraints.maxWidth * 0.90;  // set the card width to 90% of the available width
 
-                  child: Card(  // card widget to contain the signup form fields
-                    elevation: 8,  // set elevation to add shadow around the card
-                    shape: RoundedRectangleBorder(  // rounded rectangle shape for the card
-                      borderRadius: BorderRadius.circular(15),  // set the border radius for rounded corners
-                    ),  // end RoundedRectangleBorder
+                    if (constraints.maxWidth > 600) {  // for larger screens
+                      cardWidth = 400;  // fixed width for larger screens
+                    }
 
-                    child: Padding(  // padding inside the card
-                      padding: const EdgeInsets.all(16.0),  // padding on all sides of the card content
+                    return Padding(  // add padding around the card
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),  // symmetric padding horizontally
 
-                      child: Column(  // column to arrange the form fields vertically
-                        mainAxisSize: MainAxisSize.min,  // make the column take only the necessary space
+                      child: Card(  // card widget to contain the signup form fields
+                        elevation: 8,  // set elevation to add shadow around the card
+                        shape: RoundedRectangleBorder(  // rounded rectangle shape for the card
+                          borderRadius: BorderRadius.circular(15),  // set the border radius for rounded corners
+                        ),  // end RoundedRectangleBorder
 
-                        children: <Widget>[
+                        child: SizedBox(  // use SizedBox to constrain the width of the card
+                          width: cardWidth,  // set the width of the card
+                          child: Padding(  // padding inside the card
+                            padding: const EdgeInsets.all(16.0),  // padding on all sides of the card content
 
-                          TextField(  // text field for email input
-                            controller: _signupLogic.emailController,  // connect the email controller
+                            child: Column(  // column to arrange the form fields vertically
+                              mainAxisSize: MainAxisSize.min,  // make the column take only the necessary space
 
-                            decoration: InputDecoration(  // input decoration for the text field
-                              hintText: Strings.emailHint,  // hint text to guide the user
-                              prefixIcon: const Icon(Icons.email, color: AppColors.blue),  // icon before the input text
-                              filled: true,  // fill the background with color
-                              fillColor: AppColors.white,  // set background fill color to white
-                              border: OutlineInputBorder(  // outline border around the text field
-                                borderRadius: BorderRadius.circular(30),  // rounded corners for the text field
-                                borderSide: const BorderSide(color: AppColors.blue),  // set the border color to blue
-                              ),  // end OutlineInputBorder
-                            ),  // end InputDecoration
-                          ),  // end TextField
+                              children: <Widget>[
 
-                          const SizedBox(height: 10),  // vertical spacing between text fields
+                                TextField(  // text field for email input
+                                  controller: _signupLogic.emailController,  // connect the email controller
 
-                          TextField(  // text field for password input
-                            controller: _signupLogic.passwordController,  // connect the password controller
+                                  decoration: InputDecoration(  // input decoration for the text field
+                                    hintText: Strings.emailHint,  // hint text to guide the user
+                                    prefixIcon: const Icon(Icons.email, color: AppColors.blue),  // icon before the input text
+                                    filled: true,  // fill the background with color
+                                    fillColor: AppColors.white,  // set background fill color to white
+                                    border: OutlineInputBorder(  // outline border around the text field
+                                      borderRadius: BorderRadius.circular(30),  // rounded corners for the text field
+                                      borderSide: const BorderSide(color: AppColors.blue),  // set the border color to blue
+                                    ),  // end OutlineInputBorder
+                                  ),  // end InputDecoration
+                                ),  // end TextField
 
-                            obscureText: true,  // obscure the text for password input
-                            decoration: InputDecoration(  // input decoration for the text field
-                              hintText: Strings.passwordHint,  // hint text to guide the user
-                              prefixIcon: const Icon(Icons.lock, color: AppColors.blue),  // icon before the input text
-                              filled: true,  // fill the background with color
-                              fillColor: AppColors.white,  // set background fill color to white
-                              border: OutlineInputBorder(  // outline border around the text field
-                                borderRadius: BorderRadius.circular(30),  // rounded corners for the text field
-                                borderSide: const BorderSide(color: AppColors.blue),  // set the border color to blue
-                              ),  // end OutlineInputBorder
-                            ),  // end InputDecoration
+                                const SizedBox(height: 10),  // vertical spacing between text fields
 
-                          ),  // end TextField
+                                TextField(  // text field for password input
+                                  controller: _signupLogic.passwordController,  // connect the password controller
 
-                          const SizedBox(height: 10),  // vertical spacing between text fields
+                                  obscureText: true,  // obscure the text for password input
+                                  decoration: InputDecoration(  // input decoration for the text field
+                                    hintText: Strings.passwordHint,  // hint text to guide the user
+                                    prefixIcon: const Icon(Icons.lock, color: AppColors.blue),  // icon before the input text
+                                    filled: true,  // fill the background with color
+                                    fillColor: AppColors.white,  // set background fill color to white
+                                    border: OutlineInputBorder(  // outline border around the text field
+                                      borderRadius: BorderRadius.circular(30),  // rounded corners for the text field
+                                      borderSide: const BorderSide(color: AppColors.blue),  // set the border color to blue
+                                    ),  // end OutlineInputBorder
+                                  ),  // end InputDecoration
 
-                          TextField(  // text field for confirm password input
-                            controller: _signupLogic.confirmPasswordController,  // connect the confirm password controller
+                                ),  // end TextField
 
-                            obscureText: true,  // obscure the text for password input
-                            decoration: InputDecoration(  // input decoration for the text field
-                              hintText: Strings.confirmPasswordHint,  // hint text to guide the user
-                              prefixIcon: const Icon(Icons.lock, color: AppColors.blue),  // icon before the input text
-                              filled: true,  // fill the background with color
-                              fillColor: AppColors.white,  // set background fill color to white
-                              border: OutlineInputBorder(  // outline border around the text field
-                                borderRadius: BorderRadius.circular(30),  // rounded corners for the text field
-                                borderSide: const BorderSide(color: AppColors.blue),  // set the border color to blue
-                              ),  // end OutlineInputBorder
-                            ),  // end InputDecoration
-                          ),  // end TextField
+                                const SizedBox(height: 10),  // vertical spacing between text fields
 
-                          const SizedBox(height: 20),  // vertical spacing before the sign-up button
+                                TextField(  // text field for confirm password input
+                                  controller: _signupLogic.confirmPasswordController,  // connect the confirm password controller
 
-                          SizedBox(  // sized box to constrain the width of the button
-                            width: MediaQuery.of(context).size.width * 0.7,  // button width is 70% of screen width
+                                  obscureText: true,  // obscure the text for password input
+                                  decoration: InputDecoration(  // input decoration for the text field
+                                    hintText: Strings.confirmPasswordHint,  // hint text to guide the user
+                                    prefixIcon: const Icon(Icons.lock, color: AppColors.blue),  // icon before the input text
+                                    filled: true,  // fill the background with color
+                                    fillColor: AppColors.white,  // set background fill color to white
+                                    border: OutlineInputBorder(  // outline border around the text field
+                                      borderRadius: BorderRadius.circular(30),  // rounded corners for the text field
+                                      borderSide: const BorderSide(color: AppColors.blue),  // set the border color to blue
+                                    ),  // end OutlineInputBorder
+                                  ),  // end InputDecoration
 
-                            child: ElevatedButton(  // elevated button for the sign-up action
-                              onPressed: _signupLogic.isLoading ? null : () => _signupLogic.signUp(context, setState),  // disable button if loading, otherwise call sign-up logic
+                                ),  // end TextField
 
-                              style: ElevatedButton.styleFrom(  // style the button
-                                foregroundColor: AppColors.white,  // set the text color to white
-                                backgroundColor: AppColors.blue[700],  // set the button color to blue
-                                shape: RoundedRectangleBorder(  // rounded corners for the button
-                                  borderRadius: BorderRadius.circular(30),  // rounded corners
-                                ),  // end RoundedRectangleBorder
-                              ),  // end ElevatedButton.styleFrom
+                                const SizedBox(height: 20),  // vertical spacing before the sign-up button
 
-                              child: _signupLogic.isLoading  // check if loading
-                                  ? const CircularProgressIndicator(  // show loading indicator if in loading state
-                                valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),  // set loading indicator color to white
-                              )  // end CircularProgressIndicator
-                                  : const Text(Strings.signUp, style: TextStyle(fontSize: 16)),  // display 'Sign Up' text if not loading with larger font size
+                                SizedBox(  // sized box to constrain the width of the button
+                                  width: cardWidth < 500  // check if card width is less than 500
+                                      ? cardWidth * 0.7  // button width is 70% of card width for smaller screens
+                                      : 350,  // fixed width for larger screens
 
-                            ),  // end ElevatedButton
-                          ),  // end SizedBox
+                                  child: ElevatedButton(  // elevated button for the sign-up action
+                                    onPressed: _signupLogic.isLoading ? null : () => _signupLogic.signUp(context, setState),  // disable button if loading, otherwise call sign-up logic
 
-                          if (_signupLogic.errorMessage != null)  // check if there's an error message
-                            Padding(  // add padding around the error message text
-                              padding: const EdgeInsets.all(8.0),  // padding on all sides of the error message
+                                    style: ElevatedButton.styleFrom(  // style the button
+                                      foregroundColor: AppColors.white,  // set the text color to white
+                                      backgroundColor: AppColors.blue[700],  // set the button color to blue
+                                      shape: RoundedRectangleBorder(  // rounded corners for the button
+                                        borderRadius: BorderRadius.circular(30),  // rounded corners
+                                      ),  // end RoundedRectangleBorder
+                                    ),  // end ElevatedButton.styleFrom
 
-                              child: Text(  // display the error message
-                                _signupLogic.errorMessage!,  // show the error message from signup logic
-                                style: const TextStyle(color: AppColors.red, fontSize: 14),  // style the error message text color to red with a smaller font size
-                              ),  // end Text
+                                    child: _signupLogic.isLoading  // check if loading
+                                        ? const CircularProgressIndicator(  // show loading indicator if in loading state
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),  // set loading indicator color to white
+                                    )  // end CircularProgressIndicator
+                                        : const Text(Strings.signUp, style: TextStyle(fontSize: 16)),  // display 'Sign Up' text if not loading with larger font size
 
-                            ),  // end Padding
+                                  ),  // end ElevatedButton
+                                ),  // end SizedBox
 
-                        ],  // end children of Column
+                                if (_signupLogic.errorMessage != null)  // check if there is an error message
+                                  Padding(  // add padding around the error message
+                                    padding: const EdgeInsets.only(top: 16.0),  // top padding for the error message
+                                    child: Text(  // display the error message
+                                      _signupLogic.errorMessage!,  // display the error message text
+                                      style: const TextStyle(color: Colors.red),  // set the text color to red
+                                      textAlign: TextAlign.center,  // center align the error message
+                                    ),  // end Text
+                                  ),  // end Padding
 
-                      ),  // end Column
-                    ),  // end Padding
-                  ),  // end Card
-                ),  // end Padding
+                              ],
+
+                            ),  // end Column
+                          ),  // end Padding
+
+                        ),  // end SizedBox
+
+                      ),  // end Card
+
+                    );  // end Padding
+                  },  // end LayoutBuilder
+
+                ),  // end LayoutBuilder
 
               ],  // end 'children' array of 'Column'
 
