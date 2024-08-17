@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart'; // import material design package
 import 'package:towers/components/colors/app_colors.dart';
-import 'package:towers/components/login_system/constants/assets.dart'; // import assets constants
+import 'package:towers/components/google_sign_in/widgets/google_sign_in_button.dart';
 import 'package:towers/components/login_system/constants/strings.dart';
 import 'package:towers/components/login_system/controllers/login_controller.dart'; // import login controller
 import 'package:towers/components/login_system/form_validation/form_validator.dart'; // import form validation logic
+import 'package:towers/components/login_system/landing_screens/landing_page.dart';
 import 'package:towers/components/login_system/screens/SignUpPage.dart'; // import sign up page
 import 'package:towers/components/login_system/user_authentication/login/email/firebase_login_auth.dart'; // import firebase login auth
 import 'package:towers/components/login_system/user_authentication/password_reset/widgets/forgot_password_dialog.dart'; // import forgot password dialog
@@ -211,33 +212,8 @@ class _LoginPageState extends State<LoginPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
 
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement Google sign-in functionality
-                        },
-
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: AppColors.black, // text color
-                          backgroundColor: AppColors.white, // background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30), // button border radius
-                          ),
-
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20), // padding inside button
-
-                        ),
-
-                        icon: Image.asset(
-                          Assets.googleLogo, // google logo asset
-                          height: 24, // google logo height
-                          width: 24, // google logo width
-                        ),
-
-                        label: const Text(
-                          Strings.signInWithGoogle, // text for google sign in
-                          style: TextStyle(fontSize: 16), // text style
-                        ),
-
+                      child: GoogleSignInButton(
+                        landingPage: const LandingPage(), // TODO - replace with actual landing page.
                       ),
                     ),
 

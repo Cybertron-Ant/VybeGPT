@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/google_sign_in/providers/google_user_provider.dart';
 import 'package:towers/components/login_system/constants/strings.dart';
 import 'package:towers/components/login_system/user_authentication/log_out/providers/log_out_provider.dart';
 import 'login_system/user_authentication/login_state/authentication_state.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
 
         // provide 'LogOutProvider' globally available to the entire app
         ChangeNotifierProvider(create: (_) => LogOutProvider()),
+
+        // provide 'GoogleUserProvider' globally available to the entire app
+        ChangeNotifierProvider(create: (_) => GoogleUserProvider()),
 
       ], // end 'providers' array
 
