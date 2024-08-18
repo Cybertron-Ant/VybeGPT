@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart'; // import material design package
 import 'package:towers/components/colors/app_colors.dart';
+import 'package:towers/components/facebook_sign_in/widgets/facebook_sign_in_button.dart';
 import 'package:towers/components/google_sign_in/widgets/google_sign_in_button.dart';
 import 'package:towers/components/login_system/constants/strings.dart';
 import 'package:towers/components/login_system/controllers/login_controller.dart'; // import login controller
@@ -213,6 +214,17 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
 
                       child: GoogleSignInButton(
+                        landingPage: const LandingPage(), // TODO - replace with actual landing page.
+                      ),
+                    ),
+
+                    const SizedBox(height: 10), // add space
+
+                    // Google Sign-In Button
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
+
+                      child: FacebookSignInButton(
                         landingPage: const LandingPage(), // TODO - replace with actual landing page.
                       ),
                     ),

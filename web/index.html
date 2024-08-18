@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -28,15 +15,80 @@
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- Google Sign-In -->
   <meta name="google-signin-client_id" content="517883933280-dcfknpfgih68sfgq1au52jv2oi4t6lqh.apps.googleusercontent.com">
+
+  <!-- Facebook SDK initialization script -->
+  <script>
+    window.fbAsyncInit = function() {
+      console.log('Facebook SDK loaded');
+
+      <!-- Initialize the SDK with your app ID and version -->
+      FB.init({
+        appId      : '2213169272382162',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v20.0'
+      });
+
+      console.log('Facebook SDK initialized');
+      FB.AppEvents.logPageView();
+    };
+
+    (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+      console.log('Facebook SDK script added');
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
 
   <title>towers</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!-- Your Google Sign-In button -->
-  <div id="google-sign-in-button"></div>
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
-  <script src="flutter_bootstrap.js" async></script>
+<!-- Your Google Sign-In button -->
+<div id="google-sign-in-button"></div>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script src="flutter_bootstrap.js" async></script>
+
+<!-- Facebook Login button -->
+<!-- Set the element id for the JSON response -->
+<p id="profile"></p>
+<script>
+  <!-- Add the Facebook SDK for JavaScript -->
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  window.fbAsyncInit = function() {
+    <!-- Initialize the SDK with your app and the Graph API version for your app -->
+    FB.init({
+      appId            : '2213169272382162',
+      xfbml            : true,
+      version          : 'v20.0'
+    });
+
+    <!-- If you are logged in, automatically get your name and email address, and public profile information -->
+    FB.login(function(response) {
+      if (response.authResponse) {
+        console.log('Welcome! Fetching your information....');
+        FB.api('/me', {fields: 'name, email'}, function(response) {
+          document.getElementById("profile").innerHTML = "Good to see you, " + response.name + ". I see your email address is " + response.email;
+        });
+      } else {
+        <!-- If you are not logged in, the login dialog will open for you to login asking for permission to get your public profile and email -->
+        console.log('User cancelled login or did not fully authorize.');
+      }
+    });
+  };
+</script>
 </body>
 </html>

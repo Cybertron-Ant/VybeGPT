@@ -103,7 +103,7 @@ firebase login
 dart pub global activate flutterfire_cli
 
 connect to your firebase project using the project id:
-flutterfire configure --project=project-one-bbbef
+flutterfire configure --testfacebooklogin
 
 select/check the platforms you want your app to be deployed on using the 'space bar'
 
@@ -127,8 +127,8 @@ details.useVersion '1.8.22'
 }
 
 example commands to reconfigure or add a new OS(android, IOS, Linux, MacOS) app to firebase:
-flutterfire configure --project=project-one-bbbef
-com.kaibacorp.firebasetest43 
+flutterfire configure --testfacebooklogin
+com.kaibacorp.testfacebooklogin
 
 ## kotlin version mismatch error solution:
 The project expects Kotlin version 1.6.0, but it's using libraries compiled with Kotlin 1.8.0.
@@ -167,14 +167,32 @@ Save changes.
 ## facebook login
 https://developers.facebook.com/apps/
 
-select 'Android' and follow the steps:
+select 'Settings'(input https://one-firebase-4266a.firebaseapp.com/__/auth/handler in the 'Valid OAuth Redirect URIs') 
+-> select 'QuickStart' -> select 'Android' and follow the steps:
 https://developers.facebook.com/apps/2213169272382162/use_cases/customize/settings/?product_route=fb-login
 
+
+#### generate debug key hash:
 your keystore can be found when you generate a SHA-1 key, look at the 'Store' section(below 'Config' section) to see the path:
 the following 'after' path(between the quotation marks) can be added to your environment variables so it can be accessed anywhere on your computer(C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin):
 go to openssl 'bin' folder, copy the path(in your file explorer) & paste it between the quotation marks below:
 (before) keytool -exportcert -alias androiddebugkey -keystore "keystore-path-goes-here~/.android/debug.keystore" | openssl sha1 -binary | "path-goes-here-openssl" base64
 (after) keytool -exportcert -alias androiddebugkey -keystore "C:\Users\Antonio\.android\debug.keystore" | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
+
+#### generate keystore file via terminal(windows, not android studio) for facebook authentication:
+
+keytool -genkey -v -keystore C:\Users\Antonio\Desktop\testfacebooklogin\debug.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias testfacebooklogin
+
+keystore password: password
+
+#### generate a Release Key Hash: keytool -exportcert -alias facebookKeyStore -keystore "C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.keystore" | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
+
+release key hash: 0zO/YWnvpiMe5QeC60bVy8Sb+jU=
+
+#### generate a Debug Key Hash: keytool -exportcert -alias androiddebugkey -keystore "C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore" | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
+
+debug key hash: VzSiQcXRmi2kyjzcA+mYLEtbGVs=
+----------------------------------
 
 if you can't see the 'save' button, zoom out the web page:
 paste the SHA1 debug and release hashes(press Enter after each input) in the facebook tutorial walk-through, in the 'Key Hashes' input field
@@ -196,8 +214,17 @@ https://project-one-bbbef.firebaseapp.com/facebook/login/callback/
 https://project-one-bbbef.firebaseapp.com/accounts/facebook/login/callback/
 
 
-Client token:
+copy the Client token(under 'App Settings' click the 'Advanced' menu item,
+and turn on 'Allow API Access to app settings'):
 https://developers.facebook.com/apps/2213169272382162/settings/advanced/
+
+copy app ID and app secret to use in firebase later(under 'App Settings' click the 'Basic' menu item):
+https://developers.facebook.com/apps/1253965036017166/settings/basic/?business_id=1026989398912511
+
+if your App ID is 12345678123456, your fb_login_protocol_scheme is fb123456781234567
+
+Facebook Auth and Firebase - How to add 4 apps under same Facebook app?:
+https://stackoverflow.com/questions/49343327/facebook-auth-and-firebase-how-to-add-4-apps-under-same-facebook-app?rq=3
 
 setup facebook business account:
 https://developers.facebook.com/apps/2213169272382162/verification/
@@ -285,31 +312,103 @@ If you’re using Google Sign-In for Web, ensure the Google API client library (
 Ensure that the Google API client library (gapi.client) is loaded in your HTML page. 
 This can be added to your index.html: <script src="https://apis.google.com/js/platform.js" async defer></script>
 
-com.kaibacorp.towers:
+
+## build 'release' signed apk
+https://docs.flutter.dev/deployment/android
+
+generate signing key for release:
+keytool -genkey -v -keystore %userprofile%\upload-keystore.jks ^
+-storetype JKS -keyalg RSA -keysize 2048 -validity 10000 ^
+-alias upload
+
+
+add the following to your 'path' under 'system variables' in environment variables:
+C:\antboy\Android Studio Jellyfish1\jbr\bin
+
+# dummy keytool:
+keytool -genkey -v -keystore %userprofile%\upload-keystore.jks ^
+-storetype JKS -keyalg RSA -keysize 2048 -validity 10000 ^
+-alias upload
+
+
+## my keytool for my app {open a terminal(not in Android Studio) and run this command}('upload-keystore' is name of the file & can be anything):
+keytool -genkey -v -keystore C:\Users\Antonio\Desktop\towers\upload-keystore.jks ^
+-storetype JKS -keyalg RSA -keysize 2048 -validity 10000 ^
+-alias testKeyStore
+
+
+replace 'java' (at the end) with 'keytool', also add it to env variables as a path:
+Java binary:
+C:\antboy\Android Studio Jellyfish1\jbr\bin\java
+
+Java binary:
+C:\antboy\Android Studio Jellyfish1\jbr\bin\keytool
+
+## generate apk file or aab file:
+flutter build apk
+flutter build aab
+
+
+### change package name:
+flutter pub run change_app_package_name:main com.kaibacorp.testfacebooklogin
+
+### generate keystore file:
+keytool -genkey -v -keystore C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias testfacebookloginkeystore
+
+### get debug and release keys:
+if you have properly configured your build.gradle file to point to the keystore located at C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks,
+then running "./gradlew signingReport" will include the SHA-1 and SHA-256 fingerprints for that specific keystore stored at that file location.
+the keys (SHA-1 and SHA-256 fingerprints) will be the same each time you run ./gradlew signingReport,
+as long as you are using the same keystore file: ./gradlew signingReport
+
+
+### Generate Debug Key Hash(The default alias for the debug keystore is androiddebugkey.
+The default password for the debug keystore is android):
+keytool -exportcert -alias androiddebugkey -keystore "C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore" | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
+
+
+### Generate Release Key Hash(Replace testfacebookloginkeystore with your alias.
+Use the correct path to your release keystore.
+Enter your keystore password when prompted.):
+keytool -exportcert -alias testfacebookloginkeystore -keystore C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
+
+
+build.gradle file should correctly reference the new location of the debug keystore and handle signing configurations properly for both debug and release builds if it it moved eg:
+C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
+
+
+com.kaibacorp.testfacebooklogin:
 > Task :app:signingReport
 Variant: debug
 Config: debug
-Store: C:\Users\Antonio\.android\debug.keystore
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
 Alias: AndroidDebugKey
 MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
 SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
 SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
 Valid until: Monday, April 20, 2054
 ----------
-
 Variant: release
-Config: debug
-Store: C:\Users\Antonio\.android\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
+Config: release
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks
+Alias: testfacebookloginkeystore
+MD5: 8E:75:CA:A7:7D:0A:04:F2:7D:FF:3D:D4:03:78:4E:5D
+SHA1: FE:5F:C0:44:06:F1:3C:1E:77:56:61:3E:8A:20:F2:83:57:21:E5:69
+SHA-256: 08:03:F4:F0:EB:F0:B7:08:E4:C1:00:E9:CD:C4:AB:48:9F:65:47:53:F0:6C:3F:6D:F1:99:9E:65:95:18:87:AB
+Valid until: Thursday, January 4, 2052
 ----------
-
 Variant: profile
 Config: debug
-Store: C:\Users\Antonio\.android\debug.keystore
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
+Alias: AndroidDebugKey
+MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
+SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
+SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
+Valid until: Monday, April 20, 2054
+----------
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
 Alias: AndroidDebugKey
 MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
 SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
@@ -317,9 +416,10 @@ SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68
 Valid until: Monday, April 20, 2054
 ----------
 
+> Task :cloud_firestore:signingReport
 Variant: debugAndroidTest
 Config: debug
-Store: C:\Users\Antonio\.android\debug.keystore
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
 Alias: AndroidDebugKey
 MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
 SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
@@ -330,7 +430,7 @@ Valid until: Monday, April 20, 2054
 > Task :firebase_auth:signingReport
 Variant: debugAndroidTest
 Config: debug
-Store: C:\Users\Antonio\.android\debug.keystore
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
 Alias: AndroidDebugKey
 MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
 SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
@@ -341,7 +441,51 @@ Valid until: Monday, April 20, 2054
 > Task :firebase_core:signingReport
 Variant: debugAndroidTest
 Config: debug
-Store: C:\Users\Antonio\.android\debug.keystore
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
+Alias: AndroidDebugKey
+MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
+SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
+SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
+Valid until: Monday, April 20, 2054
+----------
+
+> Task :flutter_facebook_auth:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
+Alias: AndroidDebugKey
+MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
+SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
+SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
+Valid until: Monday, April 20, 2054
+----------
+
+> Task :flutter_secure_storage:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
+Alias: AndroidDebugKey
+MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
+SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
+SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
+Valid until: Monday, April 20, 2054
+----------
+
+> Task :google_sign_in_android:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
+Alias: AndroidDebugKey
+MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
+SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
+SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
+Valid until: Monday, April 20, 2054
+----------
+
+> Task :path_provider_android:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
 Alias: AndroidDebugKey
 MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
 SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11

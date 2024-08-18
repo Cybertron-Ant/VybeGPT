@@ -65,7 +65,7 @@ class GoogleSignInProvider {
 
       // print the error to the console
       if (kDebugMode) {
-        print(e.toString());
+        print('Error signing in with Google: $e');
       }
 
       if (context.mounted) {
@@ -90,15 +90,24 @@ class GoogleSignInProvider {
   /// to ensure the user is fully signed out
   Future<void> signOut(BuildContext context) async {
 
-    // sign out from Google account
-    await _googleSignIn.signOut();
+    try {
 
-    // sign out from Firebase
-    await _auth.signOut();
+      // sign out from Google account
+      await _googleSignIn.signOut();
 
-    if (context.mounted) {
-      // clear user data from 'GoogleUserProvider'
-      Provider.of<GoogleUserProvider>(context, listen: false).clearUser();
+      // sign out from Firebase
+      await _auth.signOut();
+
+      if (context.mounted) {
+        // clear user data from 'GoogleUserProvider'
+        Provider.of<GoogleUserProvider>(context, listen: false).clearUser();
+      }
+    } catch (e) {
+
+      // handle any exceptions that occur during the sign-out process
+      if (kDebugMode) {
+        print('Error signing out from Google: $e');
+      }
     }
 
   } // end 'signOut' asynchronous method

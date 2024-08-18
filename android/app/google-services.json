@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "517883933280",
+    "firebase_url": "https://one-firebase-4266a-default-rtdb.firebaseio.com",
     "project_id": "one-firebase-4266a",
     "storage_bucket": "one-firebase-4266a.appspot.com"
   },
@@ -31,10 +32,10 @@
               "client_type": 3
             },
             {
-              "client_id": "517883933280-vakii96dr5cimd2c51j2r4762ieem2qj.apps.googleusercontent.com",
+              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.kaibacorp.firebasetest"
+                "bundle_id": "com.kaibacorp.towers"
               }
             }
           ]
@@ -43,9 +44,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:517883933280:android:a5ea240cc471824845c905",
+        "mobilesdk_app_id": "1:517883933280:android:deae96419d5c9e1345c905",
         "android_client_info": {
-          "package_name": "com.kaibacorp.towers"
+          "package_name": "com.kaibacorp.geminiapi"
         }
       },
       "oauth_client": [
@@ -67,10 +68,90 @@
               "client_type": 3
             },
             {
-              "client_id": "517883933280-vakii96dr5cimd2c51j2r4762ieem2qj.apps.googleusercontent.com",
+              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.kaibacorp.firebasetest"
+                "bundle_id": "com.kaibacorp.towers"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517883933280:android:b3a0660b8ecad6c245c905",
+        "android_client_info": {
+          "package_name": "com.kaibacorp.testfacebooklogin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ay_dC8xHzcTSq8LlGtsPjdUjfYBVx7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kaibacorp.towers"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517883933280:android:a5ea240cc471824845c905",
+        "android_client_info": {
+          "package_name": "com.kaibacorp.towers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517883933280-76edpap5heus1gdk5ls6buqq9e156sid.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.towers",
+            "certificate_hash": "8c09ef707a0dcbd5539561664adfc0aa0ef53a11"
+          }
+        },
+        {
+          "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ay_dC8xHzcTSq8LlGtsPjdUjfYBVx7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kaibacorp.towers"
               }
             }
           ]

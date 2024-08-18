@@ -48,28 +48,33 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAiVsZqSiLFXZF-tetK-pfFOZZ-sHPmrjc',
-    appId: '1:517883933280:web:81d3160bfbf5779745c905',
+    appId: '1:517883933280:web:5579781f9156471745c905',
     messagingSenderId: '517883933280',
     projectId: 'one-firebase-4266a',
     authDomain: 'one-firebase-4266a.firebaseapp.com',
+    databaseURL: 'https://one-firebase-4266a-default-rtdb.firebaseio.com',
     storageBucket: 'one-firebase-4266a.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD-ay_dC8xHzcTSq8LlGtsPjdUjfYBVx7E',
-    appId: '1:517883933280:android:a5ea240cc471824845c905',
+    appId: '1:517883933280:android:b3a0660b8ecad6c245c905',
     messagingSenderId: '517883933280',
     projectId: 'one-firebase-4266a',
+    databaseURL: 'https://one-firebase-4266a-default-rtdb.firebaseio.com',
     storageBucket: 'one-firebase-4266a.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBX7JkzB7KK2PVQ8F8X09eUsOGw6XejZIg',
-    appId: '1:517883933280:ios:9cea66954ce1cad045c905',
+    appId: '1:517883933280:ios:5ccaca9eda9cc71e45c905',
     messagingSenderId: '517883933280',
     projectId: 'one-firebase-4266a',
+    databaseURL: 'https://one-firebase-4266a-default-rtdb.firebaseio.com',
     storageBucket: 'one-firebase-4266a.appspot.com',
-    iosClientId: '517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com',
-    iosBundleId: 'com.kaibacorp.towers',
+    androidClientId: '517883933280-76edpap5heus1gdk5ls6buqq9e156sid.apps.googleusercontent.com',
+    iosClientId: '517883933280-i953i0sbp3b86i7ah69n1258ffrndfr4.apps.googleusercontent.com',
+    iosBundleId: 'com.kaibacorp.testfacebooklogin',
   );
+
 }

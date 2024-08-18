@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:provider/provider.dart';
+import 'package:towers/components/facebook_sign_in/providers/facebook_sign_in_provider.dart';
 import 'package:towers/components/login_system/screens/LoginPage.dart';
 
 
-class LandingPage extends StatelessWidget {
+class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
+
+  @override
+  _LandingPageState createState() => _LandingPageState();
+}
+
+class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
+
+  @override
+  void initState() {
+    super.initState();
+    // Add this widget as an observer
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // Remove this widget as an observer
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // The app is in the background or closed
+      _updateLastOnline();
+    }
+  }
+
+  Future<void> _updateLastOnline() async {
+    final facebookSignInProvider = Provider.of<FacebookSignInProvider>(context, listen: false);
+    await facebookSignInProvider.updateLastOnline();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +55,8 @@ class LandingPage extends StatelessWidget {
             icon: const Icon(Icons.logout),
 
             onPressed: () async {
-              // sign out from Firebase
-              await FirebaseAuth.instance.signOut();
+              // access the 'FacebookSignInProvider' and call its 'signOut' method
+              await Provider.of<FacebookSignInProvider>(context, listen: false).signOut(context);
 
               if (context.mounted) {
 

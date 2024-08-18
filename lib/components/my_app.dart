@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/facebook_sign_in/providers/facebook_sign_in_provider.dart';
+import 'package:towers/components/facebook_sign_in/providers/facebook_user_provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_user_provider.dart';
 import 'package:towers/components/login_system/constants/strings.dart';
 import 'package:towers/components/login_system/user_authentication/log_out/providers/log_out_provider.dart';
@@ -24,6 +26,12 @@ class MyApp extends StatelessWidget {
 
         // provide 'GoogleUserProvider' globally available to the entire app
         ChangeNotifierProvider(create: (_) => GoogleUserProvider()),
+
+        // register 'FacebookSignInProvider' globally to the application
+        ChangeNotifierProvider(create: (_) => FacebookSignInProvider(),),
+
+        ChangeNotifierProvider(create: (_) => FacebookUserProvider()),
+
 
       ], // end 'providers' array
 
