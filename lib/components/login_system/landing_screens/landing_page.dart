@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart'; // Import EmailSignInProvider
 import 'package:towers/components/facebook_sign_in/providers/facebook_sign_in_provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart'; // Import GoogleSignInProvider
 import 'package:towers/components/login_system/screens/LoginPage.dart';
@@ -38,6 +39,9 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
   }
 
   Future<void> _updateLastOnline(BuildContext context) async {
+    // update 'lastOnline' for email user
+    final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
+    await emailSignInProvider.updateLastOnline();
 
     // update last online for Facebook user
     final facebookSignInProvider = Provider.of<FacebookSignInProvider>(context, listen: false);
@@ -65,6 +69,9 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
             icon: const Icon(Icons.logout),
 
             onPressed: () async {
+              // access 'EmailSignInProvider' & call its 'signOut' method
+              await Provider.of<EmailSignInProvider>(context, listen: false).signOut(context);
+
               // access the 'FacebookSignInProvider' and call its 'signOut' method
               await Provider.of<FacebookSignInProvider>(context, listen: false).signOut(context);
 

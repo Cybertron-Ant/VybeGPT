@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart'; // import material design package
+import 'package:provider/provider.dart'; // import provider package
 import 'package:towers/components/colors/app_colors.dart';
+import 'package:towers/components/email_sign_in/password_reset/forgot_password_dialog.dart';
+import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
 import 'package:towers/components/facebook_sign_in/widgets/facebook_sign_in_button.dart';
 import 'package:towers/components/google_sign_in/widgets/google_sign_in_button.dart';
 import 'package:towers/components/login_system/constants/strings.dart';
-import 'package:towers/components/login_system/controllers/login_controller.dart'; // import login controller
 import 'package:towers/components/login_system/form_validation/form_validator.dart'; // import form validation logic
 import 'package:towers/components/login_system/landing_screens/landing_page.dart';
 import 'package:towers/components/login_system/screens/SignUpPage.dart'; // import sign up page
-import 'package:towers/components/login_system/user_authentication/login/email/firebase_login_auth.dart'; // import firebase login auth
-import 'package:towers/components/login_system/user_authentication/password_reset/widgets/forgot_password_dialog.dart'; // import forgot password dialog
-import 'package:towers/components/login_system/user_authentication/screen_logics/login_logic.dart'; // import login logic
+
 
 
 class LoginPage extends StatefulWidget {
@@ -20,14 +20,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final LoginController _loginController = LoginController(); // initialize login controller
-  final _signInWithEmailAndPassword = SignInWithEmailAndPassword(); // initialize sign in method
-
   final _formKey = GlobalKey<FormState>(); // key for form validation
 
   @override
   void dispose() {
-    _loginController.dispose(); // dispose of login controller
     super.dispose(); // call super dispose
   }
 
@@ -80,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                             children: <Widget>[
 
                               TextFormField(
-                                controller: _loginController.emailController, // email controller
+                                controller: Provider.of<EmailSignInProvider>(context, listen: false).emailController, // email controller
 
                                 decoration: InputDecoration(
                                   hintText: Strings.emailHint, // hint text for email
@@ -98,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(height: 10), // add space
 
                               TextFormField(
-                                controller: _loginController.passwordController, // password controller
+                                controller: Provider.of<EmailSignInProvider>(context, listen: false).passwordController, // password controller
 
                                 obscureText: true, // obscure password text
                                 decoration: InputDecoration(
@@ -122,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                                 child: GestureDetector(
                                   onTap: () {
                                     ForgotPasswordDialog.showForgotPasswordDialog(
-                                        context, _loginController.emailController.text); // show forgot password dialog
+                                        context, Provider.of<EmailSignInProvider>(context, listen: false).emailController.text); // show forgot password dialog
                                   },
 
                                   child: const Text(
@@ -141,7 +137,9 @@ class _LoginPageState extends State<LoginPage> {
                                 width: double.infinity, // make button full width
 
                                 child: ElevatedButton(
-                                  onPressed: _loginController.isLoading ? null : () => _login(context), // handle button press
+                                  onPressed: Provider.of<EmailSignInProvider>(context).isLoading
+                                      ? null
+                                      : () => _login(context), // handle button press
 
                                   style: ElevatedButton.styleFrom(
                                     foregroundColor: AppColors.white, // text color
@@ -151,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
 
-                                  child: _loginController.isLoading
+                                  child: Provider.of<EmailSignInProvider>(context).isLoading
                                       ? const CircularProgressIndicator(color: AppColors.white) // show progress indicator if loading
                                       : const Text(Strings.login), // button text
                                 ),
@@ -220,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     const SizedBox(height: 10), // add space
 
-                    // Google Sign-In Button
+                    // Facebook Sign-In Button
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
 
@@ -242,12 +240,12 @@ class _LoginPageState extends State<LoginPage> {
 
 
   Future<void> _login(BuildContext context) async {
+    final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
 
-    await LoginLogic.login(
+    await emailSignInProvider.signInWithEmail(
       context,
-      _formKey,
-      _loginController,
-      _signInWithEmailAndPassword,
+      emailSignInProvider.emailController.text,
+      emailSignInProvider.passwordController.text,
     ); // perform login operation
 
   } // end '_login' method

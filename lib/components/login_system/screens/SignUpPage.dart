@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';  // import flutter material design package
 import 'package:towers/components/colors/app_colors.dart';
-import 'package:towers/components/login_system/constants/assets.dart';  // import assets file containing constants for asset paths
-import 'package:towers/components/login_system/constants/strings.dart';
-import 'package:towers/components/login_system/user_authentication/screen_logics/signup_logic.dart';  // import signup logic for handling sign up process
+import 'package:towers/components/email_sign_in/constants/assets.dart';
+import 'package:towers/components/email_sign_in/constants/strings.dart';
+import 'package:towers/components/email_sign_in/sign_up/sign_up_logic.dart';
+
 
 class SignUpPage extends StatefulWidget {  // define a stateful widget for the signup page
   const SignUpPage({super.key});  // constructor for the signup page
@@ -168,15 +169,48 @@ class _SignUpPageState extends State<SignUpPage> {  // define the state for the 
 
                                 if (_signupLogic.errorMessage != null)  // check if there is an error message
                                   Padding(  // add padding around the error message
-                                    padding: const EdgeInsets.only(top: 16.0),  // top padding for the error message
+                                    padding: const EdgeInsets.only(top: 16.0),  // add top padding
+
                                     child: Text(  // display the error message
-                                      _signupLogic.errorMessage!,  // display the error message text
-                                      style: const TextStyle(color: Colors.red),  // set the text color to red
-                                      textAlign: TextAlign.center,  // center align the error message
+                                      _signupLogic.errorMessage!,  // get the error message from the logic
+
+                                      style: const TextStyle(
+                                          color: Colors.red,
+                                          ),  // set the text color to red
                                     ),  // end Text
                                   ),  // end Padding
 
-                              ],
+                                const SizedBox(height: 5),  // vertical spacing before the login link
+
+                                Row(  // row for the 'already have an account' link
+                                  mainAxisAlignment: MainAxisAlignment.center,  // center the link
+
+                                  children: <Widget>[
+
+                                    const Text(  // text for the link
+                                      Strings.haveAccount,  // have an account string from constants
+                                      style: TextStyle(color: AppColors.black),  // set the text color to white
+                                    ),  // end Text
+
+                                    TextButton(  // button to navigate to the login page
+                                      onPressed: () => Navigator.of(context).pop(),  // navigate back to the previous screen (login page)
+
+                                      child: const Text(  // text for the button
+                                        Strings.login,  // login string from constants
+
+                                        style: TextStyle(
+                                          color: AppColors.blue, // blue text color
+                                          fontWeight: FontWeight.bold, // bold text
+                                          decoration: TextDecoration.underline, // underline text
+                                        ),  // set text font & color to white
+                                      ),  // end Text
+                                    ),  // end TextButton
+
+                                  ],  // end children
+
+                                ),  // end Row
+
+                              ],  // end children
 
                             ),  // end Column
                           ),  // end Padding

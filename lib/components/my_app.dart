@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
+import 'package:towers/components/email_sign_in/providers/email_user_provider.dart';
 import 'package:towers/components/facebook_sign_in/providers/facebook_sign_in_provider.dart';
 import 'package:towers/components/facebook_sign_in/providers/facebook_user_provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
@@ -35,6 +37,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FacebookSignInProvider(),),
 
         ChangeNotifierProvider(create: (_) => FacebookUserProvider()),
+
+        // register 'EmailSignInProvider' & 'EmailUserProvider' globally to the application
+        ChangeNotifierProvider(create: (_) => EmailSignInProvider(),),
+
+        ChangeNotifierProvider(create: (_) => EmailUserProvider()),
 
 
       ], // end 'providers' array
