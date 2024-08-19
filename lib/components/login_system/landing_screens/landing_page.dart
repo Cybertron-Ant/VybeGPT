@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:towers/components/facebook_sign_in/providers/facebook_sign_in_provider.dart';
+import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart'; // Import GoogleSignInProvider
 import 'package:towers/components/login_system/screens/LoginPage.dart';
 
 
@@ -32,13 +33,22 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       // The app is in the background or closed
-      _updateLastOnline();
+      _updateLastOnline(context);
     }
   }
 
-  Future<void> _updateLastOnline() async {
+  Future<void> _updateLastOnline(BuildContext context) async {
+
+    // update last online for Facebook user
     final facebookSignInProvider = Provider.of<FacebookSignInProvider>(context, listen: false);
     await facebookSignInProvider.updateLastOnline();
+
+    if (context.mounted) {
+      // update last online for Google user
+      final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false); // Get GoogleSignInProvider
+      await googleSignInProvider.updateLastOnline(); // Update last online timestamp for Google user
+    }
+
   }
 
   @override
@@ -59,7 +69,11 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
               await Provider.of<FacebookSignInProvider>(context, listen: false).signOut(context);
 
               if (context.mounted) {
+                // access the 'GoogleSignInProvider' and call its 'signOut' method
+                await Provider.of<GoogleSignInProvider>(context, listen: false).signOut(context);
+              }
 
+              if (context.mounted) {
                 // navigate back to 'LoginPage'
                 Navigator.pushReplacement(
                   context,

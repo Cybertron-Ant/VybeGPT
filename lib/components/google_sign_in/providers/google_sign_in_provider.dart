@@ -1,20 +1,63 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/google_sign_in/constants/constants.dart';
 import 'package:towers/components/google_sign_in/models/google_user_model.dart';
 import 'package:towers/components/google_sign_in/providers/google_user_provider.dart';
 
 
 /// a provider class for handling Google Sign-In authentication
-class GoogleSignInProvider {
+class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
 
   /// an instance of [FirebaseAuth] to interact with Firebase authentication
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  /// an instance of [FirebaseFirestore] to interact with Firebase Firestore
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   /// an instance of [GoogleSignIn] to handle Google Sign-In operations
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  /// a private user object to store the current authenticated user
+  User? _user;
+
+  /// the currently signed-in user, or null if no user is signed in
+  GoogleUserModel? _userModel;
+
+  /// getter to retrieve the current user
+  GoogleUserModel? get userModel => _userModel;
+
+  /// getter for the current user
+  User? get user => _user;
+
+  /// constructor to initialize the observer
+  GoogleSignInProvider() {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // the app is in the background
+      updateOnlineStatus(false);
+    } else if (state == AppLifecycleState.resumed) {
+      // the app is in the foreground
+      updateOnlineStatus(true);
+    }
+  }
+
+  /// updates the 'online' status of the user
+  Future<void> updateOnlineStatus(bool isOnline) async {
+    if (_user != null) {
+      await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+        'isOnline': isOnline, // update 'online' status
+        'lastOnline': DateTime.now(), // update last 'online' timestamp
+      });
+    }
+  }
 
   /// signs in the user using Google Sign-In and returns a [User] object
   /// triggers the Google Sign-In flow, obtains the authentication details,
@@ -42,24 +85,75 @@ class GoogleSignInProvider {
         idToken: googleAuth.idToken,
       ); // end 'credential'
 
-      // sign in to Firebase using the Google credential & obtain a 'UserCredential'
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      try {
 
-      // get the user from Firebase
-      final User? user = userCredential.user;
+        // sign in to Firebase using the Google credential & obtain a 'UserCredential'
+        final UserCredential userCredential = await _auth.signInWithCredential(credential);
 
-      if (user != null && context.mounted) {
-        // store the user's email and profile photo URL in the 'GoogleUserProvider'
-        Provider.of<GoogleUserProvider>(context, listen: false).setUser(
-          GoogleUserModel(
-            email: user.email!,
-            profilePhoto: user.photoURL,
-          ),
-        );
+        // get the user from Firebase
+        _user = userCredential.user;
+
+        if (_user != null && context.mounted) {
+          // store the user's email and profile photo URL in the 'GoogleUserProvider'
+          _userModel = GoogleUserModel(
+            email: _user!.email!,
+            profilePhoto: _user!.photoURL,
+            isOnline: true,
+          );
+          Provider.of<GoogleUserProvider>(context, listen: false).setUser(_userModel!);
+
+          // save the user's data in Firestore
+          await _firestore.collection(Constants.usersCollection).doc(_user!.email).set({
+            'email': _user!.email!,
+            'profilePhoto': _user!.photoURL,
+            'lastLogin': DateTime.now(),
+            'isOnline': true, // set the user as 'online'
+            'lastOnline': DateTime.now(), // save the last online timestamp
+          }, SetOptions(merge: true));
+
+          // notify listeners to update the UI
+          notifyListeners();
+        }
+
+        // return the 'user' object associated with the sign-in
+        return _user;
+
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'account-exists-with-different-credential') {
+          final String email = e.email!;
+          if (kDebugMode) {
+            print('Account exists with a different credential for email: $email');
+          }
+
+          // fetch sign-in methods for the email
+          final List<String> signInMethods = await _auth.fetchSignInMethodsForEmail(email);
+
+          if (signInMethods.contains('password')) {
+            if (kDebugMode) {
+              print('Account exists with a different credential. Please sign in using the existing provider.');
+            }
+            // handle this case in the UI
+          }
+
+          // assuming user provides existing credentials
+          final UserCredential existingUserCredential = await _auth.signInWithEmailAndPassword(
+            email: email,
+            password: 'user-provided-password', // Replace with actual password
+          );
+
+          await existingUserCredential.user!.linkWithCredential(credential);
+
+          _user = existingUserCredential.user;
+        } else if (e.code == 'invalid-credential') {
+          if (kDebugMode) {
+            print('Invalid Google credential. Please check your token and try again.');
+          }
+        } else {
+          if (kDebugMode) {
+            print('Error signing in with Google: $e');
+          }
+        }
       }
-
-      // return the 'user' object associated with the sign-in
-      return user;
 
     } catch (e) {
 
@@ -78,10 +172,10 @@ class GoogleSignInProvider {
         ); // end 'showSnackBar'
       }
 
-      // return null if an error occurs during sign-in
-      return null;
-
     } // end 'CATCH'
+
+    // return null if an exception occurs or the sign-in fails
+    return null;
 
   } // end 'signInWithGoogle' asynchronous method
 
@@ -98,10 +192,25 @@ class GoogleSignInProvider {
       // sign out from Firebase
       await _auth.signOut();
 
+      // update the user's status to offline in Firestore after signing out
+      if (_user != null) {
+        await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+          'isOnline': false, // set the user as offline
+          'lastOnline': DateTime.now(), // update last online timestamp
+        });
+      }
+
+      // Clear user data from 'GoogleUserProvider'
       if (context.mounted) {
         // clear user data from 'GoogleUserProvider'
         Provider.of<GoogleUserProvider>(context, listen: false).clearUser();
       }
+
+      // reset the private user object
+      _user = null;
+
+      // notify listeners to update the UI
+      notifyListeners();
     } catch (e) {
 
       // handle any exceptions that occur during the sign-out process
@@ -111,5 +220,16 @@ class GoogleSignInProvider {
     }
 
   } // end 'signOut' asynchronous method
+
+  /// updates the last online timestamp in Firestore
+  Future<void> updateLastOnline() async {
+
+    if (_user != null) {
+      await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+        'lastOnline': DateTime.now(), // Update last online timestamp
+      });
+    }
+
+  } // end 'updateLastOnline' asynchronous method
 
 } // end 'GoogleSignInProvider' class

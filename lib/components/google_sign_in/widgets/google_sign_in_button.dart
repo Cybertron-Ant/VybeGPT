@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/login_system/constants/assets.dart';
-
 
 /// A stateless widget that represents a button for Google Sign-In.
 /// This button depends on [GoogleSignInProvider] to work.
 class GoogleSignInButton extends StatelessWidget {
-
-  /// An instance of [GoogleSignInProvider] to handle Google Sign-In authentication.
-  final GoogleSignInProvider _googleSignInProvider = GoogleSignInProvider();
 
   /// The landing page widget to navigate to after a successful sign-in.
   final Widget landingPage;
@@ -23,7 +20,8 @@ class GoogleSignInButton extends StatelessWidget {
   void _signInWithGoogle(BuildContext context) async {
 
     // attempt to sign in the user with Google.
-    User? user = await _googleSignInProvider.signInWithGoogle(context);
+    final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    User? user = await googleSignInProvider.signInWithGoogle(context);
 
     // if the sign-in is successful & the context is valid, navigate to [landingPage].
     if (user != null && context.mounted) {
