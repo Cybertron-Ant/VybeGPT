@@ -350,145 +350,93 @@ flutter build aab
 
 
 ### change package name:
-flutter pub run change_app_package_name:main com.kaibacorp.testfacebooklogin
+flutter pub run change_app_package_name:main com.kaibacorp.streetvybezgpt
 
 ### generate keystore file:
-keytool -genkey -v -keystore C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias testfacebookloginkeystore
+keytool -genkey -v -keystore C:\Users\Antonio\Desktop\streetvybezgpt\streetvybezgptkeystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias streetvybezgptkeystore
 
 ### get debug and release keys:
-if you have properly configured your build.gradle file to point to the keystore located at C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks,
+change directory:
+cd ./android
+
+IMPORTANT - if you have properly configured your build.gradle file to point to the keystore located at C:\Users\Antonio\Desktop\streetvybezgpt\streetvybezgptkeystore.jks
 then running "./gradlew signingReport" will include the SHA-1 and SHA-256 fingerprints for that specific keystore stored at that file location.
 the keys (SHA-1 and SHA-256 fingerprints) will be the same each time you run ./gradlew signingReport,
 as long as you are using the same keystore file: ./gradlew signingReport
 
 
 ### Generate Debug Key Hash(The default alias for the debug keystore is androiddebugkey.
-The default password for the debug keystore is android):
-keytool -exportcert -alias androiddebugkey -keystore "C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore" | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
+The default password for the debug keystore is "android"):
+keytool -exportcert -alias androiddebugkey -keystore "C:\Users\Antonio\Desktop\streetvybezgpt\debug.keystore" | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
 
 
 ### Generate Release Key Hash(Replace testfacebookloginkeystore with your alias.
 Use the correct path to your release keystore.
 Enter your keystore password when prompted.):
-keytool -exportcert -alias testfacebookloginkeystore -keystore C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
+keytool -exportcert -alias streetvybezgptkeystore -keystore C:\Users\Antonio\Desktop\streetvybezgpt\streetvybezgptkeystore.jks | openssl sha1 -binary | "C:\Users\Antonio\Desktop\notes\openssl\openssl-0.9.8k_X64\bin\openssl" base64
 
+- The debug keystore is typically located at C:\Users\Antonio\.android\debug.keystore on Windows, or ~/.android/debug.keystore on Unix-like systems
 
 build.gradle file should correctly reference the new location of the debug keystore and handle signing configurations properly for both debug and release builds if it it moved eg:
-C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
+C:\Users\Antonio\Desktop\streetvybezgpt\debug.keystore
 
 
-com.kaibacorp.testfacebooklogin:
+### Generate a New debug Keystore (if needed):
+-keystore specifies the location of the keystore file.
+-alias is the alias name for the key entry.
+-storepass and -keypass are passwords for the keystore and key, respectively:
+keytool -genkey -v -keystore C:/Users/Antonio/.android/debug.keystore -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -storepass android -keypass android
+
+### key hashes: 
+6i2PLdi45yk8HtkFI2pY/fsDnlQ=
+F09GxWgSqEOJcHjHh2UgLR7+I5k=
+
+### Clean and Rebuild:
+./gradlew clean
+./gradlew build
+
+
+- be sure to reconnect your project to firebase to support the new package name(if it was changed) 
+- and download google-services file if SHA1 key was added to firebase
+- In the Credentials section of Google Cloud Console, ensure OAuth 2.0 Client IDs match configuration in Firebase Console.
+- Make sure package name and SHA-1 fingerprint are correctly listed under 'OAuth client ID' for your Android app(web platform) & get the client id.
+
+
+com.kaibacorp.streetvybezgpt:
 > Task :app:signingReport
 Variant: debug
 Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
+Store: C:\Users\Antonio\Desktop\streetvybezgpt\debug.keystore
+Alias: androiddebugkey
+MD5: E8:EC:D5:91:C6:8B:59:DE:42:7F:A8:51:82:3F:75:37
+SHA1: 6E:65:85:4D:CF:C9:0A:43:66:A9:F6:4E:EC:DA:0C:6F:2A:3E:7A:3F
+SHA-256: 7C:2F:24:93:E7:C7:7D:5F:6D:20:59:0A:03:2A:2A:F7:64:3A:21:12:37:0F:D6:FE:AD:96:20:87:7A:D0:98:4D
+Valid until: Monday, January 8, 2052
 ----------
 Variant: release
 Config: release
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\testfacebookloginkeystore.jks
-Alias: testfacebookloginkeystore
-MD5: 8E:75:CA:A7:7D:0A:04:F2:7D:FF:3D:D4:03:78:4E:5D
-SHA1: FE:5F:C0:44:06:F1:3C:1E:77:56:61:3E:8A:20:F2:83:57:21:E5:69
-SHA-256: 08:03:F4:F0:EB:F0:B7:08:E4:C1:00:E9:CD:C4:AB:48:9F:65:47:53:F0:6C:3F:6D:F1:99:9E:65:95:18:87:AB
-Valid until: Thursday, January 4, 2052
+Store: C:\Users\Antonio\Desktop\streetvybezgpt\streetvybezgptkeystore.jks
+Alias: streetvybezgptkeystore
+MD5: 59:A2:E1:F8:22:8C:5A:A6:FE:96:B1:A9:3E:D7:14:D8
+SHA1: AF:1A:87:83:FB:33:8C:E1:33:6D:BD:66:22:11:5D:2A:21:1D:D3:E1
+SHA-256: 31:6F:85:DC:79:55:83:08:98:61:0C:A4:13:E9:69:3A:16:EC:3C:D0:65:25:C2:49:E3:7B:77:23:B6:1E:DC:96
+Valid until: Monday, January 8, 2052
 ----------
 Variant: profile
 Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
+Store: C:\Users\Antonio\Desktop\streetvybezgpt\debug.keystore
+Alias: androiddebugkey
+MD5: E8:EC:D5:91:C6:8B:59:DE:42:7F:A8:51:82:3F:75:37
+SHA1: 6E:65:85:4D:CF:C9:0A:43:66:A9:F6:4E:EC:DA:0C:6F:2A:3E:7A:3F
+SHA-256: 7C:2F:24:93:E7:C7:7D:5F:6D:20:59:0A:03:2A:2A:F7:64:3A:21:12:37:0F:D6:FE:AD:96:20:87:7A:D0:98:4D
+Valid until: Monday, January 8, 2052
 ----------
 Variant: debugAndroidTest
 Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
-----------
-
-> Task :cloud_firestore:signingReport
-Variant: debugAndroidTest
-Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
-----------
-
-> Task :firebase_auth:signingReport
-Variant: debugAndroidTest
-Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
-----------
-
-> Task :firebase_core:signingReport
-Variant: debugAndroidTest
-Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
-----------
-
-> Task :flutter_facebook_auth:signingReport
-Variant: debugAndroidTest
-Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
-----------
-
-> Task :flutter_secure_storage:signingReport
-Variant: debugAndroidTest
-Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
-----------
-
-> Task :google_sign_in_android:signingReport
-Variant: debugAndroidTest
-Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
-----------
-
-> Task :path_provider_android:signingReport
-Variant: debugAndroidTest
-Config: debug
-Store: C:\Users\Antonio\Desktop\testfacebooklogin\debug.keystore
-Alias: AndroidDebugKey
-MD5: 24:03:46:95:AE:F8:43:03:99:5A:89:36:A7:2A:F9:33
-SHA1: 8C:09:EF:70:7A:0D:CB:D5:53:95:61:66:4A:DF:C0:AA:0E:F5:3A:11
-SHA-256: 10:D0:04:71:CD:D9:E9:11:74:42:78:B1:05:56:17:3C:37:2B:B8:1B:AC:D2:0C:68:F6:DE:00:30:F8:F2:65:72
-Valid until: Monday, April 20, 2054
+Store: C:\Users\Antonio\Desktop\streetvybezgpt\debug.keystore
+Alias: androiddebugkey
+MD5: E8:EC:D5:91:C6:8B:59:DE:42:7F:A8:51:82:3F:75:37
+SHA1: 6E:65:85:4D:CF:C9:0A:43:66:A9:F6:4E:EC:DA:0C:6F:2A:3E:7A:3F
+SHA-256: 7C:2F:24:93:E7:C7:7D:5F:6D:20:59:0A:03:2A:2A:F7:64:3A:21:12:37:0F:D6:FE:AD:96:20:87:7A:D0:98:4D
+Valid until: Monday, January 8, 2052
 ----------

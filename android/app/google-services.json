@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "517883933280-9ac5mi3ui5ujjev89mq0ecdrv5e337u7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.firebasetest43",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
           "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -28,14 +36,14 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_id": "517883933280-077u5ic1mlnegq254tjhnr85kcm917tu.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
+              "client_id": "517883933280-esd9jejfqk1kpoq4d7r9bovr3uvl0laj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.kaibacorp.towers"
+                "bundle_id": "com.kaibacorp.streetvybezgpt"
               }
             }
           ]
@@ -51,6 +59,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "517883933280-m6657ff23hf826u2rgn61882cp6v2i96.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.geminiapi",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
           "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -64,14 +80,66 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_id": "517883933280-077u5ic1mlnegq254tjhnr85kcm917tu.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
+              "client_id": "517883933280-esd9jejfqk1kpoq4d7r9bovr3uvl0laj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.kaibacorp.towers"
+                "bundle_id": "com.kaibacorp.streetvybezgpt"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517883933280:android:79d12ba249b18a8d45c905",
+        "android_client_info": {
+          "package_name": "com.kaibacorp.streetvybezgpt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517883933280-0vv9brsqdss4cdu5iudb16p7nlvh2b5r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.streetvybezgpt",
+            "certificate_hash": "af1a8783fb338ce1336dbd6622115d2a211dd3e1"
+          }
+        },
+        {
+          "client_id": "517883933280-8asbn4vl4e71r3jsi6i6nc4ihvj0t7qu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.streetvybezgpt",
+            "certificate_hash": "6e65854dcfc90a4366a9f64eecda0c6f2a3e7a3f"
+          }
+        },
+        {
+          "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ay_dC8xHzcTSq8LlGtsPjdUjfYBVx7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517883933280-077u5ic1mlnegq254tjhnr85kcm917tu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517883933280-esd9jejfqk1kpoq4d7r9bovr3uvl0laj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kaibacorp.streetvybezgpt"
               }
             }
           ]
@@ -87,6 +155,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "517883933280-evi5jaiqq6mecoalp8rsffsa4tc30gp2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.testfacebooklogin",
+            "certificate_hash": "8c09ef707a0dcbd5539561664adfc0aa0ef53a11"
+          }
+        },
+        {
+          "client_id": "517883933280-kocpj3uit37sh6ov4nutg99vkhe2g8rt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.testfacebooklogin",
+            "certificate_hash": "fe5fc04406f13c1e7756613e8a20f2835721e569"
+          }
+        },
+        {
           "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -100,14 +184,14 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_id": "517883933280-077u5ic1mlnegq254tjhnr85kcm917tu.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
+              "client_id": "517883933280-esd9jejfqk1kpoq4d7r9bovr3uvl0laj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.kaibacorp.towers"
+                "bundle_id": "com.kaibacorp.streetvybezgpt"
               }
             }
           ]
@@ -131,6 +215,14 @@
           }
         },
         {
+          "client_id": "517883933280-l3rl9r27j48372lkbj2734brm83pkgal.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kaibacorp.towers",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
           "client_id": "517883933280-eh77mdmcoc13ft5kaam7vl474kqpdrj8.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -144,14 +236,14 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "517883933280-7pbpgta0879ge84s5e4evgo32cd3bp29.apps.googleusercontent.com",
+              "client_id": "517883933280-077u5ic1mlnegq254tjhnr85kcm917tu.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "517883933280-ev3ckqpig654d3mk9vg7atp8ftmglacd.apps.googleusercontent.com",
+              "client_id": "517883933280-esd9jejfqk1kpoq4d7r9bovr3uvl0laj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.kaibacorp.towers"
+                "bundle_id": "com.kaibacorp.streetvybezgpt"
               }
             }
           ]

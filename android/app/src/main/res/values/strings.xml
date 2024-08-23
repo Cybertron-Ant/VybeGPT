@@ -3,8 +3,8 @@
     <string name="app_name">StreetVybez</string>
 
     <!-- facebook login -->
-    <string name="facebook_app_id">2213169272382162</string>
-    <string name="fb_login_protocol_scheme">fb2213169272382162</string>
-    <string name="facebook_client_token">64fc43bcd8acd8629b0e9171233343d4</string>
+    <string name="facebook_app_id">1253965036017166</string>
+    <string name="fb_login_protocol_scheme">fb1253965036017166</string>
+    <string name="facebook_client_token">63aa7be16e4156d8f1fa34cb42177c1d</string>
 
 </resources>

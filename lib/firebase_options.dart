@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD-ay_dC8xHzcTSq8LlGtsPjdUjfYBVx7E',
-    appId: '1:517883933280:android:b3a0660b8ecad6c245c905',
+    appId: '1:517883933280:android:79d12ba249b18a8d45c905',
     messagingSenderId: '517883933280',
     projectId: 'one-firebase-4266a',
     databaseURL: 'https://one-firebase-4266a-default-rtdb.firebaseio.com',
@@ -67,14 +67,14 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBX7JkzB7KK2PVQ8F8X09eUsOGw6XejZIg',
-    appId: '1:517883933280:ios:5ccaca9eda9cc71e45c905',
+    appId: '1:517883933280:ios:ee4064a30195f36645c905',
     messagingSenderId: '517883933280',
     projectId: 'one-firebase-4266a',
     databaseURL: 'https://one-firebase-4266a-default-rtdb.firebaseio.com',
     storageBucket: 'one-firebase-4266a.appspot.com',
-    androidClientId: '517883933280-76edpap5heus1gdk5ls6buqq9e156sid.apps.googleusercontent.com',
-    iosClientId: '517883933280-i953i0sbp3b86i7ah69n1258ffrndfr4.apps.googleusercontent.com',
-    iosBundleId: 'com.kaibacorp.testfacebooklogin',
+    androidClientId: '517883933280-0vv9brsqdss4cdu5iudb16p7nlvh2b5r.apps.googleusercontent.com',
+    iosClientId: '517883933280-esd9jejfqk1kpoq4d7r9bovr3uvl0laj.apps.googleusercontent.com',
+    iosBundleId: 'com.kaibacorp.streetvybezgpt',
   );
 
 }
