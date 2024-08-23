@@ -402,6 +402,146 @@ F09GxWgSqEOJcHjHh2UgLR7+I5k=
 - Make sure package name and SHA-1 fingerprint are correctly listed under 'OAuth client ID' for your Android app(web platform) & get the client id.
 
 
+## deploy to firebase hosting
+- run
+```json 
+flutter build web --release 
+``` 
+app
+
+- run
+```python 
+firebase login 
+```
+
+- navigate(in terminal) to root of 'build' folder to see 'web' folder
+
+- run
+```python 
+firebase init 
+```
+
+- follow the steps and select firebase hosting(press 'SPACEBAR' to select a feature(s) then press 'Enter' to confirm)
+  optional - put your static files (e.g., HTML, CSS, JS) in your app's deploy directory (the default is "public").
+- type
+```python 
+web 
+``` 
+or
+```python  
+build/web 
+``` 
+as the public directory(since we're already inside the 'build' folder)
+
+- do NOT overwrite index.html file(n)
+
+- run
+```python 
+flutter build web 
+```
+
+- run
+```python 
+firebase deploy
+```
+(includes cloud functions) or
+ ```python 
+ firebase deploy --only hosting 
+ ```
+or host on another site
+  ```python 
+  firebase deploy --only hosting:webapptest44 
+  ```
+
+- clear your browser cache
+
+- after deploying, view your app at
+```python 
+project-one-bbbef.web.app 
+```
+
+- go to firebase console -> go to
+```python 
+Hosting 
+``` 
+tab to view the deployed website
+
+docs - https://firebase.google.com/docs/hosting/
+https://firebase.google.com/docs/hosting/quickstart
+test site locally - https://firebase.google.com/docs/hosting/test-preview-deploy
+run
+```python 
+firebase emulators:start 
+```
+
+## enable CORS  for firebase storage access
+- go to
+```python
+ Storage 
+ ``` 
+tab and copy bucket name:
+ ```python
+  gs://one-firebase-4266a.appspot.com 
+  ```
+- click on cloud shell: https://console.cloud.google.com/apis/dashboard?project=project-one-bbbef&supportedpurview=project&cloudshell=true
+- create a file called
+```python 
+cors-config.json 
+``` 
+and paste the following content(click on 'Open Editor):
+```json
+  [{
+  "origin": ["http://localhost:*", ""],
+  "method": ["GET", "HEAD", "POST", "OPTIONS"],
+  "maxAgeSeconds": 3600,
+  "responseHeader": ["Content-Type", "Authorization"]
+}]
+```
+
+- run
+```python 
+gcloud auth login 
+```
+-
+- run
+```python 
+gcloud config set project one-firebase-4266a
+ ``` 
+(project ID)
+- 
+- run
+```python 
+gcloud projects add-iam-policy-binding one-firebase-4266a \
+  --member="user:mediainformationofficer@gmail.com" \
+  --role="roles/storage.admin" 
+  ```
+-
+- run
+```python 
+gsutil cors set cors-tutorial.json gs://one-firebase-4266a.appspot.com 
+```
+-
+- run to verify
+```python
+ gsutil cors get gs://one-firebase-4266a.appspot.com  
+ ```
+
+
+## Integrate Gemini API:
+
+- create new api key: https://aistudio.google.com/app/apikey
+- select a project from your existing write-access 'Google Cloud'(aka firebase) projects eg: One-firebase
+- click the 'Documentation' menu tab and select the 'Quickstart' tab
+- after connecting your project to firebase install the Gemini API SDK:
+```python
+dart pub add google_generative_ai
+ ```
+- choose a gemini model:
+```python
+gemini-1.5-flash
+ ```
+
+
 com.kaibacorp.streetvybezgpt:
 > Task :app:signingReport
 Variant: debug

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';
 import 'package:towers/components/login_system/screens/LoginPage.dart';
-import 'package:towers/components/login_system/landing_screens/landing_page.dart';
 
 
 // responsible for dynamically switching between different pages(LoginPage & landing page)
@@ -39,7 +39,7 @@ class AuthenticationState extends StatelessWidget {
           // else if the 'snapshot' has data, it means the user is logged in
 
           // user is logged in, go to landing/home page
-          return const LandingPage();
+          return const ChatScreen();
 
         } else {
           // else if the 'snapshot' does not have data, it means the user is not logged in
