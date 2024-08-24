@@ -4,10 +4,10 @@ import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen
 import 'package:towers/components/login_system/screens/LoginPage.dart';
 
 
-// responsible for dynamically switching between different pages(LoginPage & landing page)
+// responsible for dynamically switching between different pages(LoginPage & ChatScreen)
 // based on user's authentication state using Firebase Authentication's stream
 /// this widget is responsible for dynamically switching between different pages
-/// (LoginPage & CategoryScreen) based on the user's authentication state
+/// (LoginPage & ChatScreen) based on the user's authentication state
 /// it uses Firebase Authentication's stream to monitor changes in the authentication state
 class AuthenticationState extends StatelessWidget {
   const AuthenticationState({super.key});
@@ -18,8 +18,7 @@ class AuthenticationState extends StatelessWidget {
 
     // check the user's login state here
     // 'StreamBuilder' widget to listen to changes in the authentication state
-    return StreamBuilder(
-
+    return StreamBuilder<User?>(
       // 'stream' property listens to changes in authentication state
       // 'FirebaseAuth.instance.authStateChanges()' returns a stream of 'User?' objects
       stream: FirebaseAuth.instance.authStateChanges(),
@@ -38,8 +37,10 @@ class AuthenticationState extends StatelessWidget {
         } else if (snapshot.hasData) {
           // else if the 'snapshot' has data, it means the user is logged in
 
-          // user is logged in, go to landing/home page
-          return const ChatScreen();
+          final userEmail = snapshot.data?.email ?? '';  // get the user's email from snapshot
+
+          // user is logged in, go to 'ChatScreen'
+          return ChatScreen(userEmail: userEmail);  // pass 'userEmail' to 'ChatScreen'
 
         } else {
           // else if the 'snapshot' does not have data, it means the user is not logged in

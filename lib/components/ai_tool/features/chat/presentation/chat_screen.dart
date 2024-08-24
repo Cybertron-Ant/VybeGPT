@@ -1,121 +1,129 @@
-// import the flutter material package
-// this provides the necessary widgets and tools to build the ui
-import 'package:flutter/material.dart';  // for ui components
-
-// import the provider package
-// this allows us to use the provider pattern for state management
-import 'package:provider/provider.dart';  // for state management
-
-// import the gemini_repository from the chat data folder
-// this repository handles interactions with the gemini generative ai model
-import 'package:towers/components/ai_tool/features/chat/data/gemini_repository.dart';  // for gemini repository
-
-// import the gemini_service from the chat domain folder
-// this service layer handles business logic and interacts with the repository
-import 'package:towers/components/ai_tool/features/chat/domain/gemini_service.dart';  // for gemini service
-
-// import the chat_controller from the chat presentation folder
-// this controller manages the chat ui logic and handles user interactions
-import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';  // for chat controller
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:towers/components/ai_tool/core/widgets/chat_tab.dart';
+import 'package:towers/components/ai_tool/core/widgets/saved_conversations_tab.dart';
+import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';  // for conversation repository
+import 'package:towers/components/ai_tool/features/chat/data/gemini_repository.dart';
+import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
+import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for conversation service
+import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for response generation service
+import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
+import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
+import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
+import 'package:towers/components/login_system/screens/LoginPage.dart';  // for chat controller
 
 
-// define a stateless widget named 'ChatScreen'
-// this widget represents the main screen for chatting with the ai
-class ChatScreen extends StatelessWidget {  // main chat screen widget
+class ChatScreen extends StatelessWidget {  // main chat screen widget extending StatelessWidget
 
-  // constructor with a key parameter, using super to pass the key to the parent class
-  const ChatScreen({super.key});  // constructor to initialize the chat screen
+  final String userEmail;  // user email address for saving conversations
+  final Conversation? conversation;  // optional conversation for initializing
 
-  // override the build method to define the ui layout of the chat screen
+  const ChatScreen({super.key, required this.userEmail, this.conversation});  // constructor to initialize the chat screen
+
   @override
-  Widget build(BuildContext context) {  // build method to define the widget tree
+  Widget build(BuildContext context) {
+    if (userEmail.isEmpty) {  // check if userEmail is empty
+      // show an error message or handle it accordingly
+      return const Scaffold(
+        body: Center(child: Text('Error: User email cannot be empty')),
+      );
+    }
 
-    // return a changenotifierprovider to provide the chatcontroller to the widget tree
-    return ChangeNotifierProvider(  // provide chatcontroller to the widget tree
+    return ChangeNotifierProvider<ChatController>(  // provide 'ChatController' to the widget tree
+      create: (_) {
 
-      // create a new instance of chatcontroller using geminiservice and geminirepository
-      create: (_) => ChatController(GeminiService(GeminiRepository())),  // create chatcontroller
+        final conversationService = ConversationService(ConversationRepository());  // create 'ConversationService' instance
+        final geminiRepository = GeminiRepository();  // create 'GeminiRepository' instance
+        final responseGenerationService = ResponseGenerationService(geminiRepository);  // create 'ResponseGenerationService' instance
 
-      // define a scaffold widget to provide the basic visual layout structure
-      child: Scaffold(  // scaffold provides the ui structure
+        final chatController = ChatController(
+          responseGenerationService,  // pass 'ResponseGenerationService' instance
+          conversationService,  // pass 'ConversationService' instance
+          userEmail,  // pass userEmail as a parameter
+        );
 
-        // define the app bar with a title for the chat screen
-        appBar: AppBar(title: const Text('Chat with AI')),  // app bar with screen title
+        if (conversation != null) {
+          chatController.initializeConversation(conversation!);  // initialize with the existing conversation
+        }
 
-        // define the body of the scaffold using a consumer to listen to chatcontroller changes
-        body: Consumer<ChatController>(  // consumer listens for changes in chatcontroller
+        return chatController;
+      },  // create 'ChatController'
 
-          // builder method to rebuild ui whenever chatcontroller notifies listeners
-          builder: (context, chatController, _) {  // builder method for ui updates
+      child: DefaultTabController(
+        length: 2,  // number of tabs
 
-            // return a padding widget to add spacing around the content
-            return Padding(  // add padding around the content
+        child: Scaffold(
 
-              // specify the amount of padding to apply
-              padding: const EdgeInsets.all(16.0),  // padding around the column
+          appBar: AppBar(
+            title: const Text('Chat with AI'),  // AppBar with screen title
+            automaticallyImplyLeading: false,  // remove the back navigation arrow
 
-              // define a column widget to arrange child widgets vertically
-              child: Column(  // column to arrange widgets vertically
+            actions: [  // actions to show buttons on the right side of the 'AppBar'
 
-                // define the list of child widgets for the column
-                children: [  // list of child widgets in the column
+              IconButton(
+                icon: const Icon(Icons.logout),
 
-                  // add a text field for user input
-                  // the controller is connected to the chatcontroller to manage input
-                  TextField(  // text field for user to enter prompt
+                onPressed: () async {
+                  // access 'EmailSignInProvider' & call its 'signOut' method
+                  await Provider.of<EmailSignInProvider>(context, listen: false).signOut(context);
 
-                    // connect the controller to manage the input text
-                    controller: chatController.inputController,  // input controller
+                  if (context.mounted) {
+                    // access 'GoogleSignInProvider' and call its 'signOut' method
+                    await Provider.of<GoogleSignInProvider>(context, listen: false).signOut(context);
+                  }
 
-                    // add input decoration with a label for the text field
-                    decoration: const InputDecoration(labelText: 'Enter a prompt'),  // input decoration
+                  if (context.mounted) {
+                    // navigate back to 'LoginPage'
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );  // end 'Navigator' 'pushReplacement'
+                  }
 
-                  ),  // end of textfield widget
+                },  // end asynchronous 'onPressed()'
+              ),
 
-                  // add a sizedbox to create space between widgets
-                  const SizedBox(height: 16),  // space between input field and button
+              IconButton(
+                icon: const Icon(Icons.add),  // icon for the button
 
-                  // add an elevatedbutton to trigger response generation
-                  ElevatedButton(  // button to generate response
+                onPressed: () {
+                  // access 'ChatController' using context.read()
+                  final chatController = context.read<ChatController>();
 
-                    // set the onpressed callback to generate the ai response
-                    onPressed: () => chatController.generateResponse(),  // on press event
+                  // create a new conversation and navigate to it
+                  chatController.createNewConversation(context);  // pass context to createNewConversation
+                },
 
-                    // set the button text
-                    child: const Text('Generate Response'),  // button label
+              ),
 
-                  ),  // end of elevatedbutton widget
+            ],
 
-                  // add another sizedbox to create space between widgets
-                  const SizedBox(height: 16),  // space between button and response
+            bottom: const TabBar(
 
-                  // add an expanded widget to allow the response text to scroll
-                  Expanded(  // expanded to make the response scrollable
+              tabs: [
 
-                    // wrap the response text in a singlechildscrollview
-                    child: SingleChildScrollView(  // scroll view for response text
+                Tab(text: 'Chat'),
+                Tab(text: 'Saved Conversations'),
 
-                      // display the response text using a text widget
-                      child: Text(chatController.responseText),  // display response text
+              ],
 
-                    ),  // end of singlechildscrollview widget
+            ),
+          ),
 
-                  ),  // end of expanded widget
+          body: const TabBarView(
 
-                ],  // end of column children list
+            children: [
 
-              ),  // end of column widget
+              ChatTab(),  // tab for the chat interface
+              SavedConversationsTab(),  // tab for saved conversations
 
-            );  // end of padding widget
+            ],
 
-          },  // end of builder method
-
-        ),  // end of consumer widget
-
-      ),  // end of scaffold widget
-
-    );  // end of changenotifierprovider
-
-  }  // end of build method
-
-}  // end of chatscreen class
+          ),
+        ),  // end of 'Scaffold' widget
+      ),  // end of 'DefaultTabController'
+    );  // end of 'ChangeNotifierProvider'
+  }  // end 'build' method
+}  // end of 'ChatScreen' class

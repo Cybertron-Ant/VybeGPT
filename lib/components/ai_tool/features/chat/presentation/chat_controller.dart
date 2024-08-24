@@ -1,56 +1,144 @@
-// import the flutter material package
-// this provides the necessary widgets and tools to build the ui
-import 'package:flutter/material.dart';  // for ui components and change notifier
-
-// import the gemini_service from the chat domain folder
-// this service handles the communication with the gemini ai model
-import 'package:towers/components/ai_tool/features/chat/domain/gemini_service.dart'; // for gemini model service
+import 'package:flutter/material.dart';  // for Flutter material design widgets
+import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';  // for Conversation class
+import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for ConversationService
+import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for ResponseGenerationService
+import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';  // for ChatScreen
 
 
-// define a class named 'ChatController' which extends 'ChangeNotifier'
-// this controller handles the logic for managing chat input and response
-class ChatController extends ChangeNotifier {  // controller class for chat management
+// define the 'ChatController' class which extends 'ChangeNotifier'
+class ChatController extends ChangeNotifier {
 
-  // declare a final variable for the gemini service
-  // this service will be used to get the generated response from the gemini model
-  final GeminiService geminiService;  // service instance for gemini model
+  // dependencies for generating responses & managing conversations
+  final ResponseGenerationService _responseGenerationService;  // service for generating responses
+  final ConversationService _conversationService;  // service for managing conversations
+  final String _userEmail;  // email of the user
 
-  // create a text editing controller to manage the input field
-  // this controller handles the user's input text
-  TextEditingController inputController = TextEditingController();  // controller for managing text input
+  // controller for managing text input from the user
+  final TextEditingController inputController = TextEditingController();  // controller for text input
 
-  // declare a string variable to store the generated response text
-  // this variable holds the response that will be displayed in the ui
-  String responseText = '';  // variable to store the response text
+  // internal state for response text & conversation messages
+  String _responseText = '';  // stores generated response text
+  final List<String> _messages = [];  // list of messages in the conversation
+  Conversation? _currentConversation;  // current active conversation
 
+  // constructor for initializing the ChatController with required services & user email
+  ChatController(
+      this._responseGenerationService,  // initialize response generation service
+      this._conversationService,  // initialize conversation service
+      this._userEmail,  // initialize user email
+      ) {
+    if (_userEmail.isEmpty) {
+      throw ArgumentError('User email cannot be empty');  // throw error if user email is empty
+    }
+  }
 
-  // constructor for the chatcontroller class
-  // it initializes the controller with the provided gemini service instance
-  ChatController(this.geminiService);  // constructor to initialize the chat controller with a service
+  // public getter for response text
+  String get responseText => _responseText;  // returns the response text
 
+  // public getter for messages
+  List<String> get messages => _messages;  // returns the list of messages
 
-  // define an asynchronous method to generate a response from the gemini model
-  // this method checks if the input is not empty, then fetches and stores the response
-  Future<void> generateResponse() async {  // method to handle response generation
+  // public getter for user email
+  String get userEmail => _userEmail;  // returns the user email
 
-    // check if the input field is not empty
-    // only proceed if there is text entered by the user
-    if (inputController.text.isNotEmpty) {  // condition to ensure input is not empty
+  // public getter for the current conversation
+  Conversation? get currentConversation => _currentConversation;  // returns current conversation
 
-      // get the generated response from the gemini service
-      // this sends the input text to the gemini model and receives the response
-      responseText = await geminiService.getGeneratedResponse(inputController.text);  // fetch the response from the service
+  // method to generate a response based on user input
+  Future<void> generateResponse() async {
+    // Get the input text from the controller
+    String inputText = inputController.text;  // user input text
 
-      // clear the input field after generating the response
-      // this resets the input field for the next message
-      inputController.clear();  // clear the input field
+    // add the input text to the messages list
+    _messages.add(inputText);  // add input text to messages
 
-      // notify listeners that the response text has been updated
-      // this triggers a ui update to display the new response
-      notifyListeners();  // notify listeners of state change
+    // generate a response from the response generation service
+    _responseText = await _responseGenerationService.generateResponse(inputText);  // generate response
 
-    }  // end of input check condition
+    // add the generated response to the messages list
+    _messages.add(_responseText);  // add response text to messages
 
-  }  // end of generateResponse method
+    if (_currentConversation == null) {
 
-}  // end of chatcontroller class
+      // initialize a new conversation if none exists
+      _currentConversation = Conversation(
+
+        id: DateTime.now().millisecondsSinceEpoch.toString(),  // unique conversation id
+        title: 'New Conversation',  // default title
+        messages: _messages,  // add messages to conversation
+        createdAt: DateTime.now(),  // set creation time
+        lastModified: DateTime.now(),  // initialize last modified time
+
+      );
+
+    } else {
+
+      // update existing conversation with a new instance
+      _currentConversation = Conversation(
+
+        id: _currentConversation!.id,  // retain existing conversation id
+        title: _currentConversation!.title,  // retain existing title
+        messages: _messages,  // update messages
+        createdAt: _currentConversation!.createdAt,  // retain existing creation time
+        lastModified: DateTime.now(),  // update last modified time
+
+      );
+
+    }
+
+    if (_userEmail.isNotEmpty) {
+
+      // save the conversation if user email is valid
+      await _conversationService.saveConversation(_userEmail, _currentConversation!);  // save conversation
+    } else {
+      throw ArgumentError('User email cannot be empty');  // throw error if user email is empty
+    }
+
+    notifyListeners();  // notify listeners of state changes
+  }
+
+  // method to initialize conversation with existing data
+  void initializeConversation(Conversation conversation) {
+
+    _currentConversation = conversation;  // set current conversation
+    _messages.clear();  // clear existing messages
+    _messages.addAll(conversation.messages);  // add messages from the conversation
+    notifyListeners();  // notify listeners of state changes
+
+  }
+
+  // method to reset the current conversation
+  void resetConversation() {
+    _currentConversation = null;  // clear current conversation
+    _messages.clear();  // clear messages
+    notifyListeners();  // notify listeners of state changes
+  }
+
+  // method to create a new conversation and navigate to 'ChatScreen'
+  void createNewConversation(BuildContext context) {
+
+    // create a new conversation instance
+    final newConversation = Conversation(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),  // unique conversation id
+      title: 'New Conversation',  // default title
+      messages: [],  // empty messages list
+      createdAt: DateTime.now(),  // set creation time
+      lastModified: DateTime.now(),  // initialize last modified time
+
+    );
+
+    initializeConversation(newConversation);  // initialize with the new conversation
+
+    // Navigate to 'ChatScreen' with the new conversation
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          userEmail: _userEmail,  // pass user email
+          conversation: newConversation,  // pass new conversation
+        ),
+      ),
+    );
+  }
+
+} // end of 'ChatController' class

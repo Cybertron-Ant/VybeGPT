@@ -52,4 +52,13 @@ class GeminiRepository {  // repository for handling gemini model interactions
 
   }  // end of generateResponse method
 
-}  // end of geminirepository class
+  // method to get the response stream from the model
+  // this method should interact with the model to get a stream of responses
+  Stream<String> getResponseStream() {
+
+    // implement this method to interact with the AI model and return a stream of responses
+    throw UnimplementedError();  // placeholder for actual implementation
+
+  } // end 'getResponseStream' method
+
+} // end of 'geminirepository' class

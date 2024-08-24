@@ -33,6 +33,9 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
   /// getter for the current user
   User? get user => _user;
 
+  /// getter for the user's email
+  String? get userEmail => _user?.email;
+
   /// constructor to initialize the observer
   GoogleSignInProvider() {
     WidgetsBinding.instance.addObserver(this);
