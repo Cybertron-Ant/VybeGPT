@@ -3,6 +3,7 @@ import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for ConversationService
 import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for ResponseGenerationService
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';  // for ChatScreen
+import 'package:towers/components/ai_tool/features/chat/utils/title_generator.dart';
 
 
 // define the 'ChatController' class which extends 'ChangeNotifier'
@@ -58,13 +59,16 @@ class ChatController extends ChangeNotifier {
     // add the generated response to the messages list
     _messages.add(_responseText);  // add response text to messages
 
+    // auto-generate the title from all messages as a summary
+    String title = generateTitleFromMessages(_messages);  // generate title from messages
+
     if (_currentConversation == null) {
 
       // initialize a new conversation if none exists
       _currentConversation = Conversation(
 
         id: DateTime.now().millisecondsSinceEpoch.toString(),  // unique conversation id
-        title: 'New Conversation',  // default title
+        title: title,  // auto-generated title
         messages: _messages,  // add messages to conversation
         createdAt: DateTime.now(),  // set creation time
         lastModified: DateTime.now(),  // initialize last modified time
@@ -77,7 +81,7 @@ class ChatController extends ChangeNotifier {
       _currentConversation = Conversation(
 
         id: _currentConversation!.id,  // retain existing conversation id
-        title: _currentConversation!.title,  // retain existing title
+        title: title,  // update title
         messages: _messages,  // update messages
         createdAt: _currentConversation!.createdAt,  // retain existing creation time
         lastModified: DateTime.now(),  // update last modified time
