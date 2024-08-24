@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart'; // import material design package
 import 'package:provider/provider.dart'; // import provider package
+import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';
 import 'package:towers/components/colors/app_colors.dart';
 import 'package:towers/components/email_sign_in/password_reset/forgot_password_dialog.dart';
 import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
@@ -212,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
 
                       child: GoogleSignInButton(
-                        landingPage: const LandingPage(), // TODO - replace with actual landing page.
+                        landingPage: const ChatScreen(userEmail: ''), // TODO - replace with actual landing page.
                       ),
                     ),
 
