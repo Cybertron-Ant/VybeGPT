@@ -5,7 +5,7 @@ import 'package:towers/components/ai_tool/features/chat/data/conversation_reposi
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';
-
+import 'package:towers/components/ai_tool/core/widgets/edit_conversation_dialog.dart'; // import the new dialog file
 
 class SavedConversationsTab extends StatelessWidget {
   const SavedConversationsTab({super.key});  // constructor with optional key
@@ -38,7 +38,9 @@ class SavedConversationsTab extends StatelessWidget {
         }
 
         // convert snapshot documents to Conversation objects
-        final conversations = snapshot.data!.docs.map((doc) => Conversation.fromDocument(doc)).toList();
+        final conversations = snapshot.data!.docs
+            .map((doc) => Conversation.fromDocument(doc))  // create 'Conversation' objects
+            .toList();
 
         return ListView.builder(  // 'ListView' to display conversations
           itemCount: conversations.length,  // number of items in the list
@@ -80,7 +82,16 @@ class SavedConversationsTab extends StatelessWidget {
                     builder: (context) => ChatScreen(userEmail: userEmail, conversation: conversation),
                   ),
                 );
+              },
 
+              onLongPress: () {
+                // show a dialog to edit the title using the extracted logic
+                showEditConversationDialog(
+                  context: context,
+                  userEmail: userEmail,
+                  conversationId: conversation.id,
+                  initialTitle: conversation.title,
+                );
               },
 
             );

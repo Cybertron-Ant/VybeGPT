@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';  // for DocumentSnapshot
+import 'package:cloud_firestore/cloud_firestore.dart';  // Import for Timestamp
 
 
 class Conversation {  // class representing a conversation
@@ -49,8 +49,12 @@ class Conversation {  // class representing a conversation
       id: doc.id,  // unique identifier of the document
       title: data['title'] ?? '',  // title of the conversation (default to empty string if null)
       messages: List<String>.from(data['messages'] ?? []),  // list of messages (default to empty list if null)
-      createdAt: data['createdAt'] != null ? DateTime.parse(data['createdAt']) : DateTime.now(),  // creation timestamp (default to current time if null)
-      lastModified: data['lastModified'] != null ? DateTime.parse(data['lastModified']) : DateTime.now(),  // last modified timestamp (default to current time if null)
+      createdAt: data['createdAt'] is Timestamp
+          ? (data['createdAt'] as Timestamp).toDate()  // handle Timestamp & convert to DateTime
+          : DateTime.now(),  // default to current time if data is null or not a Timestamp
+      lastModified: data['lastModified'] is Timestamp
+          ? (data['lastModified'] as Timestamp).toDate()  // handle Timestamp & convert to DateTime
+          : DateTime.now(),  // default to current time if data is null or not a Timestamp
     );
 
   }  // end of 'fromDocument' factory constructor
@@ -65,5 +69,18 @@ class Conversation {  // class representing a conversation
     return messages.last;  // return the last message in the list
 
   }  // end of 'lastMessage' getter method
+
+  // method to create a copy of the conversation with a new title
+  Conversation copyWith({
+    String? title,  // new title to update (if provided)
+  }) {
+    return Conversation(
+      id: this.id,  // retain existing id
+      title: title ?? this.title,  // use new title if provided, otherwise retain current title
+      messages: this.messages,  // retain existing messages
+      createdAt: this.createdAt,  // retain existing creation timestamp
+      lastModified: DateTime.now(),  // update last modified timestamp to current time
+    );
+  }  // end of 'copyWith' method
 
 }  // end of 'Conversation' class

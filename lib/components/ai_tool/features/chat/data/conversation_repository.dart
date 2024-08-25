@@ -59,10 +59,10 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
           .collection('conversations')  // subcollection for conversations
           .doc(conversation.id)  // document for specific conversation
           .set(
-
-            conversation.toMap()
-              ..putIfAbsent('lastModified', () => DateTime.now()),  // ensure 'lastModified' is updated
-            SetOptions(merge: true),  // merge with existing document
+        conversation.toMap()
+          ..putIfAbsent('lastModified', () => DateTime.now())  // ensure 'lastModified' is updated
+          ..putIfAbsent('createdAt', () => DateTime.now()),  // ensure 'createdAt' is set if not already present
+        SetOptions(merge: true),  // merge with existing document
 
       );  // save conversation for user
 
@@ -77,5 +77,50 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
     } // end 'CATCH'
 
   }  // end of 'saveConversation' method
+
+  // method to update the title of a specific conversation
+  // this updates only the title field of the conversation document in Firestore
+  Future<void> updateConversationTitle(String userEmail, String conversationId, String newTitle) async {
+
+    // validate inputs
+    if (userEmail.isEmpty) {
+      throw ArgumentError('User email cannot be empty');  // throw error if user email is empty
+    }
+
+    if (conversationId.isEmpty) {
+      throw ArgumentError('Conversation ID cannot be empty');  // throw error if conversation ID is empty
+    }
+
+    final path = 'users/$userEmail/conversations/$conversationId';  // path to the Firestore document
+
+    if (kDebugMode) {
+      print('Updating conversation title at path: $path');
+    }  // debugging statement
+
+    try {
+
+      await _firestore
+          .collection('users')  // Firestore collection for users
+          .doc(userEmail)  // document for specific user
+          .collection('conversations')  // subcollection for conversations
+          .doc(conversationId)  // document for specific conversation
+          .update(
+        {
+          'title': newTitle,  // update the title field
+          'lastModified': DateTime.now(),  // ensure 'lastModified' is updated
+        },
+      );  // update conversation title for user
+
+    } catch (e) {
+
+      if (kDebugMode) {
+        print('Error updating conversation title: $e');
+      }  // log error if updating fails
+
+      rethrow;  // rethrow exception to be handled by the caller
+
+    } // end 'CATCH'
+
+  }  // end of 'updateConversationTitle' method
 
 }  // end of 'ConversationRepository' class
