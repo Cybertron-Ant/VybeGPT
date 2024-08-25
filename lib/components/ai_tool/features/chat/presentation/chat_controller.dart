@@ -3,7 +3,9 @@ import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for ConversationService
 import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for ResponseGenerationService
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';  // for ChatScreen
-import 'package:towers/components/ai_tool/features/chat/utils/title_generator.dart';
+import 'package:towers/components/ai_tool/features/chat/utils/title_generator.dart';  // for title generator
+import 'package:provider/provider.dart';
+import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';  // for Provider
 
 
 // define the 'ChatController' class which extends 'ChangeNotifier'
@@ -12,7 +14,6 @@ class ChatController extends ChangeNotifier {
   // dependencies for generating responses & managing conversations
   final ResponseGenerationService _responseGenerationService;  // service for generating responses
   final ConversationService _conversationService;  // service for managing conversations
-  final String _userEmail;  // email of the user
 
   // controller for managing text input from the user
   final TextEditingController inputController = TextEditingController();  // controller for text input
@@ -22,15 +23,12 @@ class ChatController extends ChangeNotifier {
   final List<String> _messages = [];  // list of messages in the conversation
   Conversation? _currentConversation;  // current active conversation
 
-  // constructor for initializing the ChatController with required services & user email
+  // constructor for initializing the ChatController with required services
   ChatController(
       this._responseGenerationService,  // initialize response generation service
       this._conversationService,  // initialize conversation service
-      this._userEmail,  // initialize user email
       ) {
-    if (_userEmail.isEmpty) {
-      throw ArgumentError('User email cannot be empty');  // throw error if user email is empty
-    }
+    // no need to check for 'userEmail' in constructor
   }
 
   // public getter for response text
@@ -39,14 +37,11 @@ class ChatController extends ChangeNotifier {
   // public getter for messages
   List<String> get messages => _messages;  // returns the list of messages
 
-  // public getter for user email
-  String get userEmail => _userEmail;  // returns the user email
-
   // public getter for the current conversation
   Conversation? get currentConversation => _currentConversation;  // returns current conversation
 
   // method to generate a response based on user input
-  Future<void> generateResponse() async {
+  Future<void> generateResponse(BuildContext context) async {
     // Get the input text from the controller
     String inputText = inputController.text;  // user input text
 
@@ -62,43 +57,46 @@ class ChatController extends ChangeNotifier {
     // auto-generate the title from all messages as a summary
     String title = generateTitleFromMessages(_messages);  // generate title from messages
 
-    if (_currentConversation == null) {
+    if (context.mounted) {
+      // fetch user email from 'GoogleSignInProvider'
+      final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
+      final userEmail = googleSignInProvider.userEmail;
 
-      // initialize a new conversation if none exists
-      _currentConversation = Conversation(
+      if (_currentConversation == null && context.mounted) {
 
-        id: DateTime.now().millisecondsSinceEpoch.toString(),  // unique conversation id
-        title: title,  // auto-generated title
-        messages: _messages,  // add messages to conversation
-        createdAt: DateTime.now(),  // set creation time
-        lastModified: DateTime.now(),  // initialize last modified time
+        // initialize a new conversation if none exists
+        _currentConversation = Conversation(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),  // unique conversation id
+          title: title,  // auto-generated title
+          messages: _messages,  // add messages to conversation
+          createdAt: DateTime.now(),  // set creation time
+          lastModified: DateTime.now(),  // initialize last modified time
+        );
 
-      );
+      } else {
 
-    } else {
+        // update existing conversation with a new instance
+        _currentConversation = Conversation(
 
-      // update existing conversation with a new instance
-      _currentConversation = Conversation(
+          id: _currentConversation!.id,  // retain existing conversation id
+          title: title,  // update title
+          messages: _messages,  // update messages
+          createdAt: _currentConversation!.createdAt,  // retain existing creation time
+          lastModified: DateTime.now(),  // update last modified time
+        );
 
-        id: _currentConversation!.id,  // retain existing conversation id
-        title: title,  // update title
-        messages: _messages,  // update messages
-        createdAt: _currentConversation!.createdAt,  // retain existing creation time
-        lastModified: DateTime.now(),  // update last modified time
+      }
 
-      );
+      if (userEmail != null && userEmail.isNotEmpty && context.mounted) {
 
+        // save the conversation if user email is valid
+        await _conversationService.saveConversation(userEmail, _currentConversation!);  // save conversation
+      } else {
+        throw ArgumentError('User email cannot be empty');  // throw error if user email is empty
+      }
+
+      notifyListeners();  // notify listeners of state changes
     }
-
-    if (_userEmail.isNotEmpty) {
-
-      // save the conversation if user email is valid
-      await _conversationService.saveConversation(_userEmail, _currentConversation!);  // save conversation
-    } else {
-      throw ArgumentError('User email cannot be empty');  // throw error if user email is empty
-    }
-
-    notifyListeners();  // notify listeners of state changes
   }
 
   // method to initialize conversation with existing data
@@ -133,13 +131,17 @@ class ChatController extends ChangeNotifier {
 
     initializeConversation(newConversation);  // initialize with the new conversation
 
-    // Navigate to 'ChatScreen' with the new conversation
+    // fetch user email from 'GoogleSignInProvider'
+    final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    final userEmail = googleSignInProvider.userEmail;
+
+    // Navigate to 'ChatScreen' with the new conversation and user email
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ChatScreen(
-          userEmail: _userEmail,  // pass user email
           conversation: newConversation,  // pass new conversation
+          userEmail: userEmail ?? '',  // pass user email (default to empty string if null)
         ),
       ),
     );

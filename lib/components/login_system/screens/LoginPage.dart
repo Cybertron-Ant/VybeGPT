@@ -5,12 +5,12 @@ import 'package:towers/components/colors/app_colors.dart';
 import 'package:towers/components/email_sign_in/password_reset/forgot_password_dialog.dart';
 import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
 import 'package:towers/components/facebook_sign_in/widgets/facebook_sign_in_button.dart';
+import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/google_sign_in/widgets/google_sign_in_button.dart';
 import 'package:towers/components/login_system/constants/strings.dart';
 import 'package:towers/components/login_system/form_validation/form_validator.dart'; // import form validation logic
 import 'package:towers/components/login_system/landing_screens/landing_page.dart';
 import 'package:towers/components/login_system/screens/SignUpPage.dart'; // import sign up page
-
 
 
 class LoginPage extends StatefulWidget {
@@ -119,7 +119,9 @@ class _LoginPageState extends State<LoginPage> {
                                 child: GestureDetector(
                                   onTap: () {
                                     ForgotPasswordDialog.showForgotPasswordDialog(
-                                        context, Provider.of<EmailSignInProvider>(context, listen: false).emailController.text); // show forgot password dialog
+                                        context,
+                                        Provider.of<EmailSignInProvider>(context, listen: false).emailController.text
+                                    ); // show forgot password dialog
                                   },
 
                                   child: const Text(
@@ -212,8 +214,12 @@ class _LoginPageState extends State<LoginPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0), // padding for button
 
-                      child: GoogleSignInButton(
-                        landingPage: const ChatScreen(userEmail: ''), // TODO - replace with actual landing page.
+                      child: Consumer<GoogleSignInProvider>( // use Consumer to get the latest GoogleSignInProvider
+                        builder: (context, googleSignInProvider, child) {
+                          return GoogleSignInButton(
+                            landingPage: ChatScreen(userEmail: googleSignInProvider.userEmail ?? ''), // get user email from GoogleSignInProvider
+                          );
+                        },
                       ),
                     ),
 

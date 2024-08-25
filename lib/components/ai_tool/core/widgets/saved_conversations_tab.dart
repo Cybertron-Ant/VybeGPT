@@ -3,18 +3,17 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
-import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';
 import 'package:towers/components/ai_tool/core/widgets/edit_conversation_dialog.dart'; // import the new dialog file
+import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 
 class SavedConversationsTab extends StatelessWidget {
-  const SavedConversationsTab({super.key});  // constructor with optional key
+  final String userEmail;  // Add userEmail as a parameter
+
+  const SavedConversationsTab({super.key, required this.userEmail});  // constructor with required userEmail
 
   @override
   Widget build(BuildContext context) {
-    // access 'userEmail' from 'ChatController'
-    final userEmail = Provider.of<ChatController>(context, listen: false).userEmail;
-
     // get the stream of conversations from the repository
     final conversationsStream = Provider.of<ConversationRepository>(context).getConversationsStream(userEmail);
 
@@ -78,8 +77,8 @@ class SavedConversationsTab extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    // pass 'userEmail' & conversation to 'ChatScreen'
-                    builder: (context) => ChatScreen(userEmail: userEmail, conversation: conversation),
+                    // pass 'conversation' & 'userEmail' to 'ChatScreen'
+                    builder: (context) => ChatScreen(conversation: conversation, userEmail: userEmail),
                   ),
                 );
               },

@@ -10,36 +10,49 @@ import 'package:towers/components/ai_tool/features/chat/domain/response_generati
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
 import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
-import 'package:towers/components/login_system/screens/LoginPage.dart';  // for chat controller
+import 'package:towers/components/login_system/screens/LoginPage.dart';
 
 
 class ChatScreen extends StatelessWidget {  // main chat screen widget extending StatelessWidget
 
-  final String userEmail;  // user email address for saving conversations
   final Conversation? conversation;  // optional conversation for initializing
+  final String userEmail;  // user email required for initializing
 
-  const ChatScreen({super.key, required this.userEmail, this.conversation});  // constructor to initialize the chat screen
+  const ChatScreen({super.key, this.conversation, required this.userEmail});  // constructor to initialize the chat screen
 
   @override
   Widget build(BuildContext context) {
-    if (userEmail.isEmpty) {  // check if userEmail is empty
-      // show an error message or handle it accordingly
+    // access 'GoogleSignInProvider' to get user's email
+    final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    final currentUserEmail = googleSignInProvider.userEmail ?? userEmail;
+
+    if (currentUserEmail == null || currentUserEmail.isEmpty) {  // Check if userEmail is empty or null
+      // navigate to 'LoginPage' if user's email is missing
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginPage(),
+          ),
+        );
+      });
+
+      // return a loading indicator while navigating
       return const Scaffold(
-        body: Center(child: Text('Error: User email cannot be empty')),
+        body: Center(child: CircularProgressIndicator()),  // show loading indicator
       );
     }
 
     return ChangeNotifierProvider<ChatController>(  // provide 'ChatController' to the widget tree
       create: (_) {
 
-        final conversationService = ConversationService(ConversationRepository());  // create 'ConversationService' instance
+        final conversationService = ConversationService(ConversationRepository());  // Create 'ConversationService' instance
         final geminiRepository = GeminiRepository();  // create 'GeminiRepository' instance
-        final responseGenerationService = ResponseGenerationService(geminiRepository);  // create 'ResponseGenerationService' instance
+        final responseGenerationService = ResponseGenerationService(geminiRepository);  // Create 'ResponseGenerationService' instance
 
         final chatController = ChatController(
           responseGenerationService,  // pass 'ResponseGenerationService' instance
           conversationService,  // pass 'ConversationService' instance
-          userEmail,  // pass userEmail as a parameter
         );
 
         if (conversation != null) {
@@ -55,7 +68,7 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
         child: Scaffold(
 
           appBar: AppBar(
-            title: const Text('Chat with AI'),  // AppBar with screen title
+            title: Text('Chat - $currentUserEmail'),  // AppBar with screen title
             automaticallyImplyLeading: false,  // remove the back navigation arrow
 
             actions: [  // actions to show buttons on the right side of the 'AppBar'
@@ -70,16 +83,16 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
                   if (context.mounted) {
                     // access 'GoogleSignInProvider' and call its 'signOut' method
                     await Provider.of<GoogleSignInProvider>(context, listen: false).signOut(context);
-                  }
 
-                  if (context.mounted) {
-                    // navigate back to 'LoginPage'
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );  // end 'Navigator' 'pushReplacement'
+                    if (context.mounted) {
+                      // navigate back to 'LoginPage'
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                      );  // end 'Navigator' 'pushReplacement'
+                    }
                   }
 
                 },  // end asynchronous 'onPressed()'
@@ -93,7 +106,7 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
                   final chatController = context.read<ChatController>();
 
                   // create a new conversation and navigate to it
-                  chatController.createNewConversation(context);  // pass context to createNewConversation
+                  chatController.createNewConversation(context);  // Pass context to createNewConversation
                 },
 
               ),
@@ -112,12 +125,11 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
             ),
           ),
 
-          body: const TabBarView(
-
+          body: TabBarView(
             children: [
 
-              ChatTab(),  // tab for the chat interface
-              SavedConversationsTab(),  // tab for saved conversations
+              ChatTab(userEmail: currentUserEmail),  // pass 'userEmail' to 'ChatTab'
+              SavedConversationsTab(userEmail: currentUserEmail),  // pass 'userEmail' to 'SavedConversationsTab'
 
             ],
 

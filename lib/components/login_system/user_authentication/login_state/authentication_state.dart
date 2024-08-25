@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';
+import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/login_system/screens/LoginPage.dart';
 
 
@@ -15,6 +17,9 @@ class AuthenticationState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // access the 'GoogleSignInProvider' instance
+    final googleSignInProvider = Provider.of<GoogleSignInProvider>(context);
 
     // check the user's login state here
     // 'StreamBuilder' widget to listen to changes in the authentication state
@@ -34,13 +39,10 @@ class AuthenticationState extends StatelessWidget {
               child: CircularProgressIndicator()
           );
 
-        } else if (snapshot.hasData) {
-          // else if the 'snapshot' has data, it means the user is logged in
+        } else if (googleSignInProvider.isSignedIn() && googleSignInProvider.userEmail != null) {
 
-          final userEmail = snapshot.data?.email ?? '';  // get the user's email from snapshot
-
-          // user is logged in, go to 'ChatScreen'
-          return ChatScreen(userEmail: userEmail);  // pass 'userEmail' to 'ChatScreen'
+          // if user is signed in & email is non-null, navigate to 'ChatScreen'
+          return ChatScreen(userEmail: googleSignInProvider.userEmail!);
 
         } else {
           // else if the 'snapshot' does not have data, it means the user is not logged in

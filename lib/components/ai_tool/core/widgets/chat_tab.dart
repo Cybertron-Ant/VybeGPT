@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
 
-
 class ChatTab extends StatelessWidget {
-  const ChatTab({super.key});  // constructor with optional key
+  final String userEmail;  // user email to be passed to the widget
+
+  const ChatTab({super.key, required this.userEmail});  // constructor with userEmail
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,7 @@ class ChatTab extends StatelessWidget {
               ElevatedButton(  // button to generate response
 
                 // set the 'onPressed' callback to generate the AI's response
-                onPressed: () => chatController.generateResponse(),  // on press event
+                onPressed: () => chatController.generateResponse(context),  // on press event
 
                 // set the button text
                 child: const Text('Generate Response'),  // button label
@@ -68,7 +69,7 @@ class ChatTab extends StatelessWidget {
                       // show existing messages if available
                       ...chatController.messages.map((message) => Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),  // padding around each message
-                        child: Text(message),  // Display each message
+                        child: Text('$userEmail: $message'),  // Display each message user's email
                       )),
 
                     ],

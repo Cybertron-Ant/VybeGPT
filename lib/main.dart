@@ -63,43 +63,44 @@ void main() async {
           // Provide 'EmailUserProvider'
           ChangeNotifierProvider(create: (_) => EmailUserProvider()),
 
+          // provide 'ConversationRepository'
+          Provider<ConversationRepository>(
+            create: (_) => ConversationRepository(), // initialize ConversationRepository
+          ),
+
           // provide 'ResponseGenerationService' as a regular provider
           Provider<ResponseGenerationService>(
             create: (_) => ResponseGenerationService(GeminiRepository()),  // create ResponseGenerationService with GeminiRepository
           ),
 
           // provide 'ConversationService'
-          ChangeNotifierProxyProvider<ConversationRepository, ConversationService>(
+          Provider<ConversationService>(
             create: (context) => ConversationService(
               context.read<ConversationRepository>(),  // pass the repository here
             ),
-            update: (context, repository, service) => ConversationService(repository),  // update ConversationService if repository changes
           ),
 
           // provide 'ChatController'
-          ChangeNotifierProxyProvider<GoogleSignInProvider, ChatController>(
-            create: (context) {
-              final responseGenerationService = Provider.of<ResponseGenerationService>(context, listen: false);  // get ResponseGenerationService
-              final conversationService = Provider.of<ConversationService>(context, listen: false);  // get ConversationService
-              final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);  // get GoogleSignInProvider
-              final userEmail = googleSignInProvider.userEmail ?? '';  // get email from GoogleSignInProvider
+          ChangeNotifierProxyProvider2<GoogleSignInProvider, ResponseGenerationService, ChatController>(
+            create: (context) => ChatController(
+              context.read<ResponseGenerationService>(),
+              context.read<ConversationService>(),
+            ),
 
-              return ChatController(
-                responseGenerationService,
-                conversationService,
-                userEmail,
-              );
-            },
-            update: (context, googleSignInProvider, chatController) {
-              final responseGenerationService = Provider.of<ResponseGenerationService>(context, listen: false);  // get ResponseGenerationService
-              final conversationService = Provider.of<ConversationService>(context, listen: false);  // get ConversationService
-              final userEmail = googleSignInProvider.userEmail ?? '';  // get email from GoogleSignInProvider
+            update: (context, googleSignInProvider, responseGenerationService, chatController) {
+              if (chatController == null) {
+                if (kDebugMode) {
+                  print('Creating new ChatController');
+                }
 
-              return ChatController(
-                responseGenerationService,
-                conversationService,
-                userEmail,
-              );
+                return ChatController(
+                  responseGenerationService,
+                  context.read<ConversationService>(),
+                );
+              }
+
+              // return existing 'chatController' if no user email changes are needed
+              return chatController;
             },
           ),
         ],
@@ -107,11 +108,12 @@ void main() async {
       ),
     );
 
-  } catch (e) {
+  } catch (e, stackTrace) {
 
     // if Firebase initialization fails, print error and run the error app
     if (kDebugMode) {
       print("Error initializing Firebase: $e");
+      print("Stack trace: $stackTrace");
     }
 
     runApp(ErrorApp(errorMessage: e.toString()));

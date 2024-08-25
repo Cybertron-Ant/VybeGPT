@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';  // for Flutter material design widgets
 import 'package:provider/provider.dart';  // for provider package
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';  // for conversation repository
@@ -29,44 +30,58 @@ class MyApp extends StatelessWidget {
       providers: [
 
         // provide 'LogOutProvider' globally available to the entire app
-        ChangeNotifierProvider(create: (_) => LogOutProvider()),  // create LogOutProvider instance
+        ChangeNotifierProvider(create: (_) => LogOutProvider()),
 
         // register 'GoogleSignInProvider' globally to the application
-        ChangeNotifierProvider(create: (_) => GoogleSignInProvider()),  // create GoogleSignInProvider instance
+        ChangeNotifierProvider(create: (_) => GoogleSignInProvider()),
 
         // provide 'GoogleUserProvider' globally available to the entire app
-        ChangeNotifierProvider(create: (_) => GoogleUserProvider()),  // create GoogleUserProvider instance
+        ChangeNotifierProvider(create: (_) => GoogleUserProvider()),
 
         // register 'FacebookSignInProvider' globally to the application
-        ChangeNotifierProvider(create: (_) => FacebookSignInProvider()),  // create FacebookSignInProvider instance
+        ChangeNotifierProvider(create: (_) => FacebookSignInProvider()),
 
         // provide 'FacebookUserProvider' globally available to the entire app
-        ChangeNotifierProvider(create: (_) => FacebookUserProvider()),  // create FacebookUserProvider instance
+        ChangeNotifierProvider(create: (_) => FacebookUserProvider()),
 
         // register 'EmailSignInProvider' globally to the application
-        ChangeNotifierProvider(create: (_) => EmailSignInProvider()),  // create EmailSignInProvider instance
+        ChangeNotifierProvider(create: (_) => EmailSignInProvider()),
 
         // provide 'EmailUserProvider' globally available to the entire app
-        ChangeNotifierProvider(create: (_) => EmailUserProvider()),  // create EmailUserProvider instance
+        ChangeNotifierProvider(create: (_) => EmailUserProvider()),
 
         // add providers for conversation management
-        ChangeNotifierProvider(create: (_) => ConversationRepository()),  // provide ConversationRepository
+        ChangeNotifierProvider(create: (_) => ConversationRepository()),
 
         // Use a ChangeNotifierProvider for ConversationService with ConversationRepository as a dependency
         ChangeNotifierProxyProvider<ConversationRepository, ConversationService>(
           create: (context) => ConversationService(
-            context.read<ConversationRepository>(),  // pass the repository to ConversationService
+            context.read<ConversationRepository>(),
           ),
-          update: (context, repository, service) => ConversationService(repository),  // update ConversationService if repository changes
+          update: (context, repository, service) => ConversationService(repository),
         ),
 
-        // ensure 'ChatController' is added
-        ChangeNotifierProvider<ChatController>(
+        // use 'ChangeNotifierProxyProvider' for ChatController
+        ChangeNotifierProxyProvider2<ConversationService, ResponseGenerationService, ChatController>(
           create: (context) => ChatController(
-            context.read<ResponseGenerationService>(),  // pass the ResponseGenerationService
-            context.read<ConversationService>(),        // pass the ConversationService
-            context.read<GoogleSignInProvider>().userEmail ?? '',  // pass the user email or an empty string if null
+            context.read<ResponseGenerationService>(),
+            context.read<ConversationService>(),
+            // no need to pass 'userEmail' as 'ChatController' will fetch it internally
           ),
+
+          update: (context, conversationService, responseGenerationService, chatController) {
+            // use existing 'ChatController' or create a new one if needed
+            if (chatController == null) {
+              if (kDebugMode) {
+                print('Initializing ChatController');
+              }
+              return ChatController(
+                responseGenerationService,
+                conversationService,
+              );
+            }
+            return chatController;
+          },
         ),
 
       ], // end 'providers' array

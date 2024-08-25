@@ -39,7 +39,22 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
   /// constructor to initialize the observer
   GoogleSignInProvider() {
     WidgetsBinding.instance.addObserver(this);
+    _initializeCurrentUser();  // initialize the current user on app startup
   }
+
+  /// initialize the current user from Firebase Auth
+  Future<void> _initializeCurrentUser() async {
+    _user = _auth.currentUser;
+
+    if (_user != null) {
+      _userModel = GoogleUserModel(
+        email: _user!.email!,
+        profilePhoto: _user!.photoURL,
+        isOnline: true,
+      );
+      notifyListeners();
+    }
+  } // end '_initializeCurrentUser' method
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -215,7 +230,6 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
       // notify listeners to update the UI
       notifyListeners();
     } catch (e) {
-
       // handle any exceptions that occur during the sign-out process
       if (kDebugMode) {
         print('Error signing out from Google: $e');
@@ -234,5 +248,10 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
     }
 
   } // end 'updateLastOnline' asynchronous method
+
+  /// checks if the user is currently signed in
+  bool isSignedIn() {
+    return _auth.currentUser != null;
+  }
 
 } // end 'GoogleSignInProvider' class
