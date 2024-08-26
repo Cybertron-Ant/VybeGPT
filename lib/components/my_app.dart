@@ -63,14 +63,20 @@ class MyApp extends StatelessWidget {
 
         // use 'ChangeNotifierProxyProvider' for ChatController
         ChangeNotifierProxyProvider2<ConversationService, ResponseGenerationService, ChatController>(
-          create: (context) => ChatController(
-            context.read<ResponseGenerationService>(),
-            context.read<ConversationService>(),
-            // no need to pass 'userEmail' as 'ChatController' will fetch it internally
-          ),
+          create: (context) {
+            final conversationService = context.read<ConversationService>();
+            final responseGenerationService = context.read<ResponseGenerationService>();
 
+            if (conversationService == null || responseGenerationService == null) {
+              throw StateError('Dependencies for ChatController are not provided.');
+            }
+
+            return ChatController(
+              responseGenerationService,
+              conversationService,
+            );
+          },
           update: (context, conversationService, responseGenerationService, chatController) {
-            // use existing 'ChatController' or create a new one if needed
             if (chatController == null) {
               if (kDebugMode) {
                 print('Initializing ChatController');
@@ -80,7 +86,12 @@ class MyApp extends StatelessWidget {
                 conversationService,
               );
             }
-            return chatController;
+
+            // if the 'ChatController' already exists, create a new instance with updated dependencies
+            return ChatController(
+              responseGenerationService,
+              conversationService,
+            );
           },
         ),
 

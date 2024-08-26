@@ -5,7 +5,8 @@ import 'package:towers/components/ai_tool/features/chat/domain/response_generati
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';  // for ChatScreen
 import 'package:towers/components/ai_tool/features/chat/utils/title_generator.dart';  // for title generator
 import 'package:provider/provider.dart';
-import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';  // for Provider
+import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';  // for GoogleSignInProvider
+import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';  // for EmailSignInProvider
 
 
 // define the 'ChatController' class which extends 'ChangeNotifier'
@@ -60,7 +61,8 @@ class ChatController extends ChangeNotifier {
     if (context.mounted) {
       // fetch user email from 'GoogleSignInProvider'
       final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
-      final userEmail = googleSignInProvider.userEmail;
+      final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
+      final userEmail = googleSignInProvider.userEmail ?? emailSignInProvider.user?.email;
 
       if (_currentConversation == null && context.mounted) {
 
@@ -131,9 +133,10 @@ class ChatController extends ChangeNotifier {
 
     initializeConversation(newConversation);  // initialize with the new conversation
 
-    // fetch user email from 'GoogleSignInProvider'
+    // fetch user email from 'GoogleSignInProvider' or 'EmailSignInProvider'
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
-    final userEmail = googleSignInProvider.userEmail;
+    final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
+    final userEmail = googleSignInProvider.userEmail ?? emailSignInProvider.user?.email;
 
     // Navigate to 'ChatScreen' with the new conversation and user email
     Navigator.push(

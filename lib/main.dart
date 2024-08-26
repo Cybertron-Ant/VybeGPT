@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,11 +29,11 @@ void main() async {
 
     // wait for Firebase to be initialized before executing other code
     // initialize Firebase using the FirebaseInitializer class
-    FirebaseApp firebaseApp = await FirebaseInitializer.initializeFirebase();
+    await FirebaseInitializer.initializeFirebase();
 
     // print initialization status
     if (kDebugMode) {
-      print("Firebase initialized successfully yay! :-) : $firebaseApp");
+      print("Firebase initialized successfully yay! :-) ");
     }
 
     // run the Flutter application with 'MaterialApp' as the root widget

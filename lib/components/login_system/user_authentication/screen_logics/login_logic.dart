@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';  // import firebase authentication package
 import 'package:flutter/material.dart';  // import flutter material design package
-import 'package:towers/components/login_system/landing_screens/landing_page.dart';  // import landing page screen from your project
-import 'package:towers/components/login_system/user_authentication/login/email/firebase_login_auth.dart';  // import firebase login authentication logic from your project
-import 'package:towers/components/login_system/controllers/login_controller.dart';  // import login controller from your project
+import 'package:provider/provider.dart';  // provider package
+import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';  // chat screen
+import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
+import 'package:towers/components/login_system/user_authentication/login/email/firebase_login_auth.dart';  // firebase login authentication logic
+import 'package:towers/components/login_system/controllers/login_controller.dart';  // login controller
 
 
 class LoginLogic {  // define login logic class
@@ -29,10 +31,16 @@ class LoginLogic {  // define login logic class
         // check if 'userCredential' is not null & if the widget is still mounted before navigating
         if (userCredential != null && context.mounted) {  // check if login was successful and context is still active
 
-          Navigator.pushReplacement(  // replace current screen with landing page
+          // set the email in 'EmailSignInProvider'
+          final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
+          emailSignInProvider.setEmail(userCredential.user!.email!);  // pass email to provider
+
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const LandingPage(),  // navigate to landing page
+              builder: (context) => ChatScreen(
+                userEmail: userCredential.user!.email!,  // pass email as 'userEmail'
+              ),
             ),
           );  // end Navigator.pushReplacement
 

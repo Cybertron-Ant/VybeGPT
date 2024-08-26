@@ -12,40 +12,28 @@ import 'package:towers/components/email_sign_in/providers/email_user_provider.da
 
 class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
 
-  /// an instance of [firebaseauth] to interact with firebase authentication
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  /// an instance of [firestore] to interact with firebase firestore
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  /// a private user object to store the current authenticated user
-  User? _user;
-
-  /// getter for the current user
-  User? get user => _user;
-
-  /// a text editing controller for email input
-  final TextEditingController emailController = TextEditingController();
-
-  /// a text editing controller for password input
-  final TextEditingController passwordController = TextEditingController();
-
-  /// a private loading state to show a loading indicator
-  bool _isLoading = false;
-
-  /// getter for the loading state
-  bool get isLoading => _isLoading;
+  final FirebaseAuth _auth = FirebaseAuth.instance;  // firebase authentication instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;  // firestore instance
+  User? _user; // current user
+  User? get user => _user; // getter for user
+  final TextEditingController emailController = TextEditingController();  // email text controller
+  final TextEditingController passwordController = TextEditingController();  // password text controller
+  bool _isLoading = false; // loading state
+  bool get isLoading => _isLoading; // getter for loading state
 
   /// constructor to initialize the WidgetsBindingObserver
   EmailSignInProvider() {
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);  // add observer to monitor app lifecycle
+    _initializeUser(); // initialize user on startup
   }
 
   /// dispose method to remove the observer when the provider is disposed
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);  // remove observer when disposing
+    emailController.dispose();  // dispose email controller
+    passwordController.dispose();  // dispose password controller
+    super.dispose();  // call superclass dispose
   }
 
   /// handle app lifecycle changes
@@ -60,10 +48,19 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _initializeUser() async {
+    _user = _auth.currentUser;  // get current user
+    if (_user != null) {
+      // You might not have access to context here, so you may need to handle this differently
+      // For example, you can notify listeners and then handle context-dependent actions in the UI
+      notifyListeners();  // notify listeners of user change
+    }
+  }
+
   /// sign in the user using email and password and returns a [user] object
   Future<void> signInWithEmail(BuildContext context, String email, String password) async {
     try {
-      _setLoading(true); // set loading to true
+      _setLoading(true); // start loading indicator
 
       // sign in to firebase using email and password
       final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -71,33 +68,31 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
         password: password,
       );
 
-      // get the user from firebase
-      _user = userCredential.user;
+      _user = userCredential.user; // get the user from firebase
 
-      if (_user != null && context.mounted) {
-        // store the user's email and profile photo url in the 'emailuserprovider'
-        Provider.of<EmailUserProvider>(context, listen: false).setUser(
-          EmailUserModel(
-            email: _user!.email!,
-            profilePhoto: _user!.photoURL,
-            isOnline: true,
-            lastOnline: DateTime.now(), // set last online timestamp
-          ),
-        );
+      if (_user != null) {
+        if (context.mounted) {
+          // store the user's email and profile photo url in the 'emailuserprovider'
+          Provider.of<EmailUserProvider>(context, listen: false).setUser(
+            EmailUserModel(
+              email: _user!.email!,
+              profilePhoto: _user!.photoURL,
+              isOnline: true,
+              lastOnline: DateTime.now(),
+            ),
+          );
 
-        // save the user's data in firestore
-        await _firestore.collection(Constants.usersCollection).doc(_user!.email).set({
+          // save the user's data in firestore
+          await _firestore.collection(Constants.usersCollection).doc(_user!.email).set({
+            'email': _user!.email!,
+            'profilePhoto': _user!.photoURL,
+            'lastLogin': DateTime.now(),
+            'isOnline': true,
+            'lastOnline': DateTime.now(),
+          }, SetOptions(merge: true));  // update or merge user document
 
-          'email': _user!.email!,
-          'profilePhoto': _user!.photoURL,
-          'lastLogin': DateTime.now(),
-          'isOnline': true, // set the user as online
-          'lastOnline': DateTime.now(), // save the last online timestamp
-
-        }, SetOptions(merge: true));
-
-        // notify listeners to update the ui
-        notifyListeners();
+          notifyListeners();  // notify listeners to update the ui
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -145,23 +140,18 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
         // update the user's status to offline in firestore
         await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
           'isOnline': false, // set the user as 'offline'
-          'lastOnline': DateTime.now(), // update last online timestamp
+          'lastOnline': DateTime.now(), // update last
         });
       }
 
-      // sign out from firebase
-      await _auth.signOut();
+      await _auth.signOut();  // sign out from firebase
 
       if (context.mounted) {
-        // clear user data from 'emailuserprovider'
-        Provider.of<EmailUserProvider>(context, listen: false).clearUser();
+        Provider.of<EmailUserProvider>(context, listen: false).clearUser();  // clear user in provider
       }
 
-      // reset the private user object
-      _user = null;
-
-      // notify listeners to update the ui
-      notifyListeners();
+      _user = null;  // reset the private user object
+      notifyListeners();  // notify listeners of user change
     } catch (e) {
       if (kDebugMode) {
         print('${Strings.signOutErrorDebug} $e');
@@ -188,10 +178,31 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  /// sets the loading state
   void _setLoading(bool isLoading) {
-    _isLoading = isLoading;
-    notifyListeners();
+    _isLoading = isLoading;  // set loading state
+    notifyListeners();  // notify listeners of loading state change
   }
+
+  // method to update the email address
+  void setEmail(String email) {
+    if (_user != null) {
+      _user!.updateEmail(email).then((_) {
+        // Update Firestore user document with new email
+        _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+          'email': email,
+        });
+        notifyListeners();  // notify listeners of email change
+      }).catchError((error) {
+        if (kDebugMode) {
+          print('Error updating email: $error');  // debug message for error updating email
+        }
+      });
+    }
+  } // end 'setEmail' method
+
+  // method to check if the user is signed in
+  bool isSignedIn() {
+    return _user != null;  // return 'true' if user is not null, indicating signed in
+  } // end 'isSignedIn' method
 
 } // end 'EmailSignInProvider' class

@@ -22,9 +22,11 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
 
   @override
   Widget build(BuildContext context) {
-    // access 'GoogleSignInProvider' to get user's email
+    // access 'EmailSignInProvider' or 'GoogleSignInProvider' to get user's email
+    final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
-    final currentUserEmail = googleSignInProvider.userEmail ?? userEmail;
+
+    final currentUserEmail = emailSignInProvider.user?.email ?? googleSignInProvider.userEmail ?? userEmail;
 
     if (currentUserEmail == null || currentUserEmail.isEmpty) {  // Check if userEmail is empty or null
       // navigate to 'LoginPage' if user's email is missing
@@ -78,11 +80,11 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
 
                 onPressed: () async {
                   // access 'EmailSignInProvider' & call its 'signOut' method
-                  await Provider.of<EmailSignInProvider>(context, listen: false).signOut(context);
+                  await emailSignInProvider.signOut(context);
 
                   if (context.mounted) {
                     // access 'GoogleSignInProvider' and call its 'signOut' method
-                    await Provider.of<GoogleSignInProvider>(context, listen: false).signOut(context);
+                    await googleSignInProvider.signOut(context);
 
                     if (context.mounted) {
                       // navigate back to 'LoginPage'
