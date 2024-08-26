@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
+import 'package:towers/components/ai_tool/core/widgets/chat_input_field.dart';  // Import the new ChatInputField
 
 class ChatTab extends StatelessWidget {
   final String userEmail;  // user email to be passed to the widget
@@ -24,35 +25,6 @@ class ChatTab extends StatelessWidget {
 
             // define the list of child widgets for the column
             children: [  // list of child widgets in the column
-
-              // add a 'TextField' for user input
-              // the controller is connected to the 'ChatController' to manage input
-              TextField(  // 'TextField' for user to enter prompt
-
-                // connect the controller to manage the input text
-                controller: chatController.inputController,  // input controller
-
-                // add input decoration with a label for the text field
-                decoration: const InputDecoration(labelText: 'Enter a prompt'),  // input decoration
-
-              ),
-
-              // add a 'SizedBox' to create space between widgets
-              const SizedBox(height: 16),  // space between input field and button
-
-              // add an ElevatedButton to trigger response generation
-              ElevatedButton(  // button to generate response
-
-                // set the 'onPressed' callback to generate the AI's response
-                onPressed: () => chatController.generateResponse(context),  // on press event
-
-                // set the button text
-                child: const Text('Generate Response'),  // button label
-
-              ),
-
-              // add another SizedBox to create space between widgets
-              const SizedBox(height: 16),  // space between button and response
 
               // add an 'Expanded' widget to allow the response text to scroll
               Expanded(  // expanded to make the response scrollable
@@ -78,6 +50,18 @@ class ChatTab extends StatelessWidget {
                 ),  // end of 'SingleChildScrollView' widget
 
               ),  // end of 'Expanded' widget
+
+              // input field positioned at the bottom of the page
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0), // add bottom padding
+
+                child: Center(
+                  child: ChatInputField(
+                    controller: chatController.inputController, // pass input controller
+                    onSend: () => chatController.generateResponse(context), // pass the 'onSend' callback
+                  ),
+                ),
+              ),
 
             ],  // end of 'Column' children list
 
