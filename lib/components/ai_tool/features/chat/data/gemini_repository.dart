@@ -8,9 +8,8 @@ import 'package:google_generative_ai/google_generative_ai.dart';  // for generat
 import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
 
 // this package provides functionality for asset loading & other services
-import 'package:flutter/services.dart';  // for loading assets
-
 // this package is used to decode JSON data into Dart objects
+import 'package:flutter/services.dart';  // for loading assets
 import 'dart:convert';  // for JSON decoding
 
 
@@ -20,12 +19,15 @@ class GeminiRepository {  // repository for handling gemini model interactions
 
   // declare a late final variable for the generative model
   // this will hold the instance of the generative model used for generating content
-  late final GenerativeModel _model;  // generative model instance
+  GenerativeModel? _model;  // generative model instance, initialized to null
+
+  // a Future that completes when the ai model is initialized
+  late final Future<void> _initialization;  // Future to track model initialization
 
   // constructor for the geminirepository class
   // this initializes the generative model using the api key from the JSON configuration file
   GeminiRepository() {  // constructor to initialize the generative model
-    _initializeModel();  // call the initialization method
+    _initialization = _initializeModel();  // start the initialization process
   }  // end of geminirepository constructor
 
   // method to initialize the generative model
@@ -60,6 +62,14 @@ class GeminiRepository {  // repository for handling gemini model interactions
   // this method takes an input text and returns the generated response
   Future<String> generateResponse(String inputText) async {  // Method to generate model response
 
+    // ensure the model is initialized
+    await _initialization;  // wait for initialization to complete
+
+    if (_model == null) {
+      // return an error message if the model is not initialized
+      return 'AI model is not initialized.';
+    }
+
     try {
       // create content for the request using the input text
       // the content is wrapped in a list as required by the model
@@ -67,7 +77,7 @@ class GeminiRepository {  // repository for handling gemini model interactions
 
       // generate content using the model and the provided input
       // this sends the request to the model and waits for the response
-      final response = await _model.generateContent(content);  // Generate content using the model
+      final response = await _model!.generateContent(content);  // Generate content using the model
 
       // extract the response text from the model's output
       // if the response is null, return a default message indicating no response
