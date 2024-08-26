@@ -62,7 +62,7 @@ class ChatController extends ChangeNotifier {
       // fetch user email from 'GoogleSignInProvider'
       final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
       final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
-      final userEmail = googleSignInProvider.userEmail ?? emailSignInProvider.user?.email;
+      final userEmail = googleSignInProvider.userEmail ?? emailSignInProvider.user!.email!;
 
       if (_currentConversation == null && context.mounted) {
 
@@ -136,7 +136,7 @@ class ChatController extends ChangeNotifier {
     // fetch user email from 'GoogleSignInProvider' or 'EmailSignInProvider'
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
     final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
-    final userEmail = googleSignInProvider.userEmail ?? emailSignInProvider.user?.email;
+    final userEmail = googleSignInProvider.userEmail ?? emailSignInProvider.user!.email!;
 
     // Navigate to 'ChatScreen' with the new conversation and user email
     Navigator.push(

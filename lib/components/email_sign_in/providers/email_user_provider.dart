@@ -10,7 +10,7 @@ class EmailUserProvider extends ChangeNotifier {
   EmailUserModel? _user;
 
   /// getter for the current user
-  EmailUserModel? get user => _user;
+  EmailUserModel? get user => _user!;
 
   /// set the user data
   void setUser(EmailUserModel user) {

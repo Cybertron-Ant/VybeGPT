@@ -34,7 +34,7 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
   User? get user => _user;
 
   /// getter for the user's email
-  String? get userEmail => _user?.email;
+  String? get userEmail => _user?.email!;
 
   /// constructor to initialize the observer
   GoogleSignInProvider() {
@@ -70,7 +70,7 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
   /// updates the 'online' status of the user
   Future<void> updateOnlineStatus(bool isOnline) async {
     if (_user != null) {
-      await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+      await _firestore.collection(Constants.usersCollection).doc(_user!.email!).update({
         'isOnline': isOnline, // update 'online' status
         'lastOnline': DateTime.now(), // update last 'online' timestamp
       });
@@ -99,8 +99,8 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
 
       // initialize a new authentication credential using the Google authentication details
       final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken!,
+        idToken: googleAuth.idToken!,
       ); // end 'credential'
 
       try {
@@ -109,7 +109,7 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
         final UserCredential userCredential = await _auth.signInWithCredential(credential);
 
         // get the user from Firebase
-        _user = userCredential.user;
+        _user = userCredential.user!;
 
         if (_user != null && context.mounted) {
           // store the user's email and profile photo URL in the 'GoogleUserProvider'
@@ -121,7 +121,7 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
           Provider.of<GoogleUserProvider>(context, listen: false).setUser(_userModel!);
 
           // save the user's data in Firestore
-          await _firestore.collection(Constants.usersCollection).doc(_user!.email).set({
+          await _firestore.collection(Constants.usersCollection).doc(_user!.email!).set({
             'email': _user!.email!,
             'profilePhoto': _user!.photoURL,
             'lastLogin': DateTime.now(),
@@ -212,7 +212,7 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
 
       // update the user's status to offline in Firestore after signing out
       if (_user != null) {
-        await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+        await _firestore.collection(Constants.usersCollection).doc(_user!.email!).update({
           'isOnline': false, // set the user as offline
           'lastOnline': DateTime.now(), // update last online timestamp
         });
@@ -242,7 +242,7 @@ class GoogleSignInProvider with ChangeNotifier, WidgetsBindingObserver {
   Future<void> updateLastOnline() async {
 
     if (_user != null) {
-      await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+      await _firestore.collection(Constants.usersCollection).doc(_user!.email!).update({
         'lastOnline': DateTime.now(), // Update last online timestamp
       });
     }

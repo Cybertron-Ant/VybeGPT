@@ -68,7 +68,7 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
         password: password,
       );
 
-      _user = userCredential.user; // get the user from firebase
+      _user = userCredential.user!; // get the user from firebase
 
       if (_user != null) {
         if (context.mounted) {
@@ -83,7 +83,7 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
           );
 
           // save the user's data in firestore
-          await _firestore.collection(Constants.usersCollection).doc(_user!.email).set({
+          await _firestore.collection(Constants.usersCollection).doc(_user!.email!).set({
             'email': _user!.email!,
             'profilePhoto': _user!.photoURL,
             'lastLogin': DateTime.now(),
@@ -138,7 +138,7 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
     try {
       if (_user != null) {
         // update the user's status to offline in firestore
-        await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+        await _firestore.collection(Constants.usersCollection).doc(_user!.email!).update({
           'isOnline': false, // set the user as 'offline'
           'lastOnline': DateTime.now(), // update last
         });
@@ -162,7 +162,7 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// update the last online timestamp in firestore
   Future<void> updateLastOnline() async {
     if (_user != null) {
-      await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+      await _firestore.collection(Constants.usersCollection).doc(_user!.email!).update({
         'lastOnline': DateTime.now(), // update last online timestamp
       });
     }
@@ -171,7 +171,7 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// update the user's online status in firestore
   Future<void> _updateUserStatus(bool isOnline) async {
     if (_user != null) {
-      await _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+      await _firestore.collection(Constants.usersCollection).doc(_user!.email!).update({
         'isOnline': isOnline, // update online status
         'lastOnline': DateTime.now(), // update last online timestamp
       });
@@ -188,7 +188,7 @@ class EmailSignInProvider extends ChangeNotifier with WidgetsBindingObserver {
     if (_user != null) {
       _user!.updateEmail(email).then((_) {
         // Update Firestore user document with new email
-        _firestore.collection(Constants.usersCollection).doc(_user!.email).update({
+        _firestore.collection(Constants.usersCollection).doc(_user!.email!).update({
           'email': email,
         });
         notifyListeners();  // notify listeners of email change

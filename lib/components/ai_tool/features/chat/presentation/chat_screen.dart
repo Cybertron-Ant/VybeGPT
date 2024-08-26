@@ -26,7 +26,7 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
     final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
 
-    final currentUserEmail = emailSignInProvider.user?.email ?? googleSignInProvider.userEmail ?? userEmail;
+    final currentUserEmail = emailSignInProvider.user?.email! ?? googleSignInProvider.userEmail ?? userEmail;
 
     if (currentUserEmail == null || currentUserEmail.isEmpty) {  // Check if userEmail is empty or null
       // navigate to 'LoginPage' if user's email is missing

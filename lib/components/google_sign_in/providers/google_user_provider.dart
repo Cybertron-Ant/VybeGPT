@@ -9,7 +9,7 @@ class GoogleUserProvider with ChangeNotifier {
   GoogleUserModel? _user;
 
   // getter to retrieve the current user data
-  GoogleUserModel? get user => _user; // returns the current user, or null if no user is set
+  GoogleUserModel? get user => _user!; // returns the current user, or null if no user is set
 
   // method to set the user data and notify listeners of the change
   void setUser(GoogleUserModel user) {
