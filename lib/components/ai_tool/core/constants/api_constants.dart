@@ -7,3 +7,5 @@ const String GEMINI_API_KEY = "AIzaSyCt8-j9AnCObf5a6uCZAIwhUwWo5qjaJwI";  // thi
 // declare a constant string for the gemini model 
 // which specifies the version of the gemini model to be used 
 const String GEMINI_MODEL = "gemini-1.5-flash";  // this is the model version for the gemini api
+
+const String configurationJSON = "assets/config.json";

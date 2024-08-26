@@ -1,14 +1,17 @@
 // import the google generative ai package
 // this package provides tools to interact with google's generative ai models
-import 'package:google_generative_ai/google_generative_ai.dart';  // for generative ai interaction
+import 'package:flutter/foundation.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';  // for generative AI interaction
 
 // import the api constants from the core components
 // this file contains constants related to api keys and other configurations
 import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
 
-// import the dart io package
-// this package provides access to platform-specific functionality like environment variables
-import 'dart:io';  // for accessing environment variables
+// this package provides functionality for asset loading & other services
+import 'package:flutter/services.dart';  // for loading assets
+
+// this package is used to decode JSON data into Dart objects
+import 'dart:convert';  // for JSON decoding
 
 
 // define a class named 'GeminiRepository'
@@ -20,36 +23,62 @@ class GeminiRepository {  // repository for handling gemini model interactions
   late final GenerativeModel _model;  // generative model instance
 
   // constructor for the geminirepository class
-  // this initializes the generative model using the api key from environment or constants
+  // this initializes the generative model using the api key from the JSON configuration file
   GeminiRepository() {  // constructor to initialize the generative model
-
-    // retrieve the api key from the environment or fall back to the constant
-    // this ensures that the correct api key is used for authentication
-    final apiKey = Platform.environment['API_KEY'] ?? GEMINI_API_KEY;  // get api key from environment or constants
-
-    // initialize the generative model with the specified model version and api key
-    // this sets up the model for generating content based on input text
-    _model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);  // initialize the generative model
-
+    _initializeModel();  // call the initialization method
   }  // end of geminirepository constructor
 
+  // method to initialize the generative model
+  // this reads the configuration file & sets up the generative model
+  Future<void> _initializeModel() async {  // method to initialize the generative model
+
+    try {
+
+      // load the configuration file from assets
+      // this reads the JSON file containing API key and other configurations
+      final configString = await rootBundle.loadString(configurationJSON);  // load configuration JSON
+      final config = jsonDecode(configString);  // decode JSON string into a map
+
+      // get the API key from the JSON configuration
+      // this ensures that the correct API key is used for authentication
+      final apiKey = config['API_KEY'];  // get API key from JSON or constants
+
+      // initialize the generative model with the specified model version and API key
+      // this sets up the model for generating content based on input text
+      _model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);  // Initialize the generative model
+
+    } catch (e) {
+      // handle any errors that occur during the initialization
+      if (kDebugMode) {
+        print('Error initializing model: $e');
+
+      }  // log the error
+    }
+  } // end of '_initializeModel' method
 
   // define an asynchronous method to generate a response from the model
   // this method takes an input text and returns the generated response
-  Future<String> generateResponse(String inputText) async {  // method to generate model response
+  Future<String> generateResponse(String inputText) async {  // Method to generate model response
 
-    // create content for the request using the input text
-    // the content is wrapped in a list as required by the model
-    final content = [Content.text(inputText)];  // create content for the model request
+    try {
+      // create content for the request using the input text
+      // the content is wrapped in a list as required by the model
+      final content = [Content.text(inputText)];  // Create content for the model request
 
-    // generate content using the model and the provided input
-    // this sends the request to the model and waits for the response
-    final response = await _model.generateContent(content);  // generate content using the model
+      // generate content using the model and the provided input
+      // this sends the request to the model and waits for the response
+      final response = await _model.generateContent(content);  // Generate content using the model
 
-    // extract the response text from the model's output
-    // if the response is null, return a default message indicating no response
-    return response.text ?? 'No response generated.';  // return the generated response or default message
-
+      // extract the response text from the model's output
+      // if the response is null, return a default message indicating no response
+      return response.text ?? 'No response generated.';  // Return the generated response or default message
+    } catch (e) {
+      // handle any errors that occur during the request
+      if (kDebugMode) {
+        print('Error generating response: $e');
+      }  // log the error
+      return 'Error generating response.';  // Return an error message
+    }
   }  // end of generateResponse method
 
   // method to get the response stream from the model
