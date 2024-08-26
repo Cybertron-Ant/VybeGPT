@@ -34,65 +34,78 @@ class ChatInputField extends StatelessWidget {
           inputWidth = constraints.maxWidth * 0.90; // change to 90% for smartphone screens
         } // end of width calculation based on screen size
 
-        return Container(
-          width: inputWidth, // set the calculated width for the container
-          padding: const EdgeInsets.symmetric(horizontal: 8.0), // add horizontal padding
+        return Center(  // center the input field horizontally
+          child: Container(
+            width: inputWidth, // set the calculated width for the container
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),  // add horizontal and vertical padding
 
-          decoration: BoxDecoration(
-            color: Colors.grey[200],  // set the background color of the container
-            borderRadius: BorderRadius.circular(30), // round the corners of the container
+            decoration: BoxDecoration(
+              color: Colors.grey[200],  // set the background color of the container
+              borderRadius: BorderRadius.circular(30), // round the corners of the container
 
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26, // set the shadow color
-                blurRadius: 4.0, // set the blur radius for the shadow
-                offset: Offset(0, 2), // set the offset for the shadow
-              ),
-            ], // end of box shadow list
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26, // set the shadow color
+                  blurRadius: 4.0, // set the blur radius for the shadow
+                  offset: Offset(0, 2), // set the offset for the shadow
+                ),
+              ], // end of box shadow list
 
-          ), //
+            ), // end of box decoration
 
-          child: Row(
-            // row to arrange the text field and send button horizontally
-            children: [
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,  // align items to the bottom
+              children: [
 
-              Expanded(
-                child: TextField(
-                  controller: controller, // bind the text field to the controller
+                Expanded(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxHeight: 150.0,  // set maximum height for the input field
+                    ),  // end of box constraints
 
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,  // remove the default border
-                    hintText: messageGazaGpt,  // set the placeholder text
-                    contentPadding: EdgeInsets.only(left: 16.0),  // add left padding to the hint text
-                  ), // end of text field decoration
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical, // enable vertical scrolling
+                      reverse: true, // start scrolling from the bottom
 
-                ), // end of text field
-              ), // end of expanded widget
+                      child: TextField(
+                        controller: controller, // bind the text field to the controller
+                        maxLines: null, // allow the text field to expand vertically
+                        minLines: 1, // set minimum number of lines
+                        keyboardType: TextInputType.multiline, // set keyboard type to 'multiline'
 
-              IconButton(
-                icon: Container(
-                  width: 36,  // set the width of the icon button container
-                  height: 36,  // set the height of the icon button container
-                  decoration: const BoxDecoration(
-                    color: Colors.black,  // set the background color of the icon button
-                    shape: BoxShape.circle,  // make the button circular
-                  ), // end of box decoration
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,  // remove the default border
+                          hintText: messageGazaGpt,  // set the placeholder text
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0),  // add horizontal padding to the text
+                        ), // end of text field decoration
 
-                  child: const Icon(Icons.send, color: Colors.white),  // add a send icon to the button
-                ), // end of icon button container
+                      ), // end of text field
+                    ), // end of 'single child scroll view'
+                  ),  // end of constrained box
+                ),  // end of expanded widget
 
-                onPressed: onSend,  // set the callback for the send button
-                padding: EdgeInsets.zero,  // remove padding around the button
-                constraints: const BoxConstraints(),  // remove any size constraints
-                iconSize: 20,  // set the icon size
-                splashColor: Colors.transparent,  // remove the splash effect
-                highlightColor: Colors.transparent,  // remove the highlight effect
-              ), // end of icon button
+                const SizedBox(width: 8.0), // add spacing between text field &77 button
 
-            ], // end of row 'children' list
+                GestureDetector(
+                  onTap: onSend, // set the callback for the send button
+                  child: Container(
+                    width: 42,  // set the width of the icon button container
+                    height: 42,  // set the height of the icon button container
+
+                    decoration: const BoxDecoration(
+                      color: Colors.black,  // set the background color of the send button
+                      shape: BoxShape.circle,  // make the button circular
+                    ), // end of box decoration
+
+                    child: const Icon(Icons.send, color: Colors.white),  // add a send icon to the button
+                  ), // end of send button container
+                ), // end of gesture detector
+
+              ], // end of row 'children' list
+
+            ),
 
           ),
-
         );
 
       }, // end of 'builder' function
