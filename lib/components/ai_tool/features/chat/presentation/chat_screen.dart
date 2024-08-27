@@ -64,80 +64,73 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
         return chatController;
       },  // create 'ChatController'
 
-      child: DefaultTabController(
-        length: 2,  // number of tabs
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Chat - $currentUserEmail'),  // AppBar with screen title
+          automaticallyImplyLeading: false,  // remove the back navigation arrow
 
-        child: Scaffold(
-
-          appBar: AppBar(
-            title: Text('Chat - $currentUserEmail'),  // AppBar with screen title
-            automaticallyImplyLeading: false,  // remove the back navigation arrow
-
-            actions: [  // actions to show buttons on the right side of the 'AppBar'
-
-              IconButton(
-                icon: const Icon(Icons.logout),
-
-                onPressed: () async {
-                  // access 'EmailSignInProvider' & call its 'signOut' method
-                  await emailSignInProvider.signOut(context);
-
-                  if (context.mounted) {
-                    // access 'GoogleSignInProvider' and call its 'signOut' method
-                    await googleSignInProvider.signOut(context);
-
-                    if (context.mounted) {
-                      // navigate back to 'LoginPage'
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                      );  // end 'Navigator' 'pushReplacement'
-                    }
-                  }
-
-                },  // end asynchronous 'onPressed()'
-              ),
-
-              IconButton(
-                icon: const Icon(Icons.add),  // icon for the button
-
-                onPressed: () {
-                  // access 'ChatController' using context.read()
-                  final chatController = context.read<ChatController>();
-
-                  // create a new conversation and navigate to it
-                  chatController.createNewConversation(context);  // Pass context to createNewConversation
-                },
-
-              ),
-
-            ],
-
-            bottom: const TabBar(
-
-              tabs: [
-
-                Tab(text: 'Chat'),
-                Tab(text: 'Saved Conversations'),
-
-              ],
-
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu), // icon for the drawer
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // open the drawer
+              },
             ),
           ),
 
-          body: TabBarView(
-            children: [
+          actions: [ // actions to show buttons on the right side of the 'AppBar'
+            IconButton(
+              icon: const Icon(Icons.logout),
 
-              ChatTab(userEmail: currentUserEmail),  // pass 'userEmail' to 'ChatTab'
-              SavedConversationsTab(userEmail: currentUserEmail),  // pass 'userEmail' to 'SavedConversationsTab'
+              onPressed: () async {
+                // access 'EmailSignInProvider' & call its 'signOut' method
+                await emailSignInProvider.signOut(context);
 
-            ],
+                if (context.mounted) {
+                  // access 'GoogleSignInProvider' and call its 'signOut' method
+                  await googleSignInProvider.signOut(context);
 
-          ),
-        ),  // end of 'Scaffold' widget
-      ),  // end of 'DefaultTabController'
+                  if (context.mounted) {
+                    // navigate back to 'LoginPage'
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );  // end 'Navigator' 'pushReplacement'
+                  }
+                }
+
+              },  // end asynchronous 'onPressed()'
+            ),
+
+            IconButton(
+              icon: const Icon(Icons.add),  // icon for the button
+
+              onPressed: () {
+                // access 'ChatController' using context.read()
+                final chatController = context.read<ChatController>();
+
+                // create a new conversation and navigate to it
+                chatController.createNewConversation(context);  // Pass context to createNewConversation
+              },
+
+            ),
+
+          ],
+
+        ),
+
+        drawer: Drawer(
+
+          child: SavedConversationsTab(userEmail: currentUserEmail), // add 'SavedConversationsTab' as drawer content
+
+        ),
+
+        body: ChatTab(userEmail: currentUserEmail),  // only 'ChatTab' in body of page
+
+      ),  // end of 'Scaffold' widget
+
     );  // end of 'ChangeNotifierProvider'
   }  // end 'build' method
 }  // end of 'ChatScreen' class
