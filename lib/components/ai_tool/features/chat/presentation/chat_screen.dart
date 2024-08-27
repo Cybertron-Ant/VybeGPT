@@ -13,7 +13,7 @@ import 'package:towers/components/google_sign_in/providers/google_sign_in_provid
 import 'package:towers/components/login_system/screens/LoginPage.dart';
 
 
-class ChatScreen extends StatelessWidget {  // main chat screen widget extending StatelessWidget
+class ChatScreen extends StatefulWidget {  // main chat screen widget extending StatefulWidget
 
   final Conversation? conversation;  // optional conversation for initializing
   final String userEmail;  // user email required for initializing
@@ -21,12 +21,19 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
   const ChatScreen({super.key, this.conversation, required this.userEmail});  // constructor to initialize the chat screen
 
   @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  bool isDrawerOpen = true;  // Track the visibility of the SavedConversationsTab
+
+  @override
   Widget build(BuildContext context) {
     // access 'EmailSignInProvider' or 'GoogleSignInProvider' to get user's email
     final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
 
-    final currentUserEmail = emailSignInProvider.user?.email! ?? googleSignInProvider.userEmail ?? userEmail;
+    final currentUserEmail = emailSignInProvider.user?.email! ?? googleSignInProvider.userEmail ?? widget.userEmail;
 
     if (currentUserEmail == null || currentUserEmail.isEmpty) {  // Check if userEmail is empty or null
       // navigate to 'LoginPage' if user's email is missing
@@ -45,92 +52,123 @@ class ChatScreen extends StatelessWidget {  // main chat screen widget extending
       );
     }
 
-    return ChangeNotifierProvider<ChatController>(  // provide 'ChatController' to the widget tree
-      create: (_) {
+    return LayoutBuilder(  // add 'LayoutBuilder' for responsive design
+      builder: (context, constraints) {
+        final isLargeScreen = constraints.maxWidth >= 600;  // determine if the screen is large
 
-        final conversationService = ConversationService(ConversationRepository());  // Create 'ConversationService' instance
-        final geminiRepository = GeminiRepository();  // create 'GeminiRepository' instance
-        final responseGenerationService = ResponseGenerationService(geminiRepository);  // Create 'ResponseGenerationService' instance
+        return ChangeNotifierProvider<ChatController>(  // provide 'ChatController' to the widget tree
+          create: (_) {
 
-        final chatController = ChatController(
-          responseGenerationService,  // pass 'ResponseGenerationService' instance
-          conversationService,  // pass 'ConversationService' instance
-        );
+            final conversationService = ConversationService(ConversationRepository());  // Create 'ConversationService' instance
+            final geminiRepository = GeminiRepository();  // create 'GeminiRepository' instance
+            final responseGenerationService = ResponseGenerationService(geminiRepository);  // Create 'ResponseGenerationService' instance
 
-        if (conversation != null) {
-          chatController.initializeConversation(conversation!);  // initialize with the existing conversation
-        }
+            final chatController = ChatController(
+              responseGenerationService,  // pass 'ResponseGenerationService' instance
+              conversationService,  // pass 'ConversationService' instance
+            );
 
-        return chatController;
-      },  // create 'ChatController'
+            if (widget.conversation != null) {
+              chatController.initializeConversation(widget.conversation!);  // initialize with the existing conversation
+            }
 
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Chat - $currentUserEmail'),  // AppBar with screen title
-          automaticallyImplyLeading: false,  // remove the back navigation arrow
+            return chatController;
+          },  // create 'ChatController'
 
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu), // icon for the drawer
-              onPressed: () {
-                Scaffold.of(context).openDrawer(); // open the drawer
-              },
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text('Chat - $currentUserEmail'),  // AppBar with screen title
+              automaticallyImplyLeading: false,  // remove the back navigation arrow
+
+              leading: isLargeScreen  // show the toggle button on large screens
+                  ? IconButton(
+                icon: Icon(isDrawerOpen ? Icons.arrow_back_ios_rounded : Icons.ad_units_sharp),
+                onPressed: () {
+                  setState(() {
+                    isDrawerOpen = !isDrawerOpen;  // toggle drawer visibility
+                  });
+                },
+              )
+                  : Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu), // icon for the drawer
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer(); // open the drawer
+                  },
+                ),
+              ),
+
+              actions: [ // actions to show buttons on the right side of the 'AppBar'
+                IconButton(
+                  icon: const Icon(Icons.logout),
+
+                  onPressed: () async {
+                    // access 'EmailSignInProvider' & call its 'signOut' method
+                    await emailSignInProvider.signOut(context);
+
+                    if (context.mounted) {
+                      // access 'GoogleSignInProvider' and call its 'signOut' method
+                      await googleSignInProvider.signOut(context);
+
+                      if (context.mounted) {
+                        // navigate back to 'LoginPage'
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );  // end 'Navigator' 'pushReplacement'
+                      }
+                    }
+
+                  },  // end asynchronous 'onPressed()'
+                ),
+
+                IconButton(
+                  icon: const Icon(Icons.add),  // icon for the button
+
+                  onPressed: () {
+                    // access 'ChatController' using context.read()
+                    final chatController = context.read<ChatController>();
+
+                    // create a new conversation and navigate to it
+                    chatController.createNewConversation(context);  // Pass context to createNewConversation
+                  },
+
+                ),
+
+              ],
+
             ),
-          ),
 
-          actions: [ // actions to show buttons on the right side of the 'AppBar'
-            IconButton(
-              icon: const Icon(Icons.logout),
+            drawer: !isLargeScreen
+                ? Drawer(
+              child: SavedConversationsTab(userEmail: currentUserEmail), // add 'SavedConversationsTab' as drawer content
+            )
+                : null,  // conditionally show the drawer on smaller screens
 
-              onPressed: () async {
-                // access 'EmailSignInProvider' & call its 'signOut' method
-                await emailSignInProvider.signOut(context);
+            body: Row(  // use Row to layout the content side by side on large screens
 
-                if (context.mounted) {
-                  // access 'GoogleSignInProvider' and call its 'signOut' method
-                  await googleSignInProvider.signOut(context);
+              children: [
 
-                  if (context.mounted) {
-                    // navigate back to 'LoginPage'
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );  // end 'Navigator' 'pushReplacement'
-                  }
-                }
+                if (isLargeScreen && isDrawerOpen)
+                  SizedBox(
+                    width: 250,  // set the width for the drawer content on large screens
+                    child: SavedConversationsTab(userEmail: currentUserEmail), // add 'SavedConversationsTab' inline for large screens
+                  ),
 
-              },  // end asynchronous 'onPressed()'
-            ),
+                Expanded(
+                  child: ChatTab(userEmail: currentUserEmail),  // main chat content with single 'ChatInputField'
+                ),
 
-            IconButton(
-              icon: const Icon(Icons.add),  // icon for the button
-
-              onPressed: () {
-                // access 'ChatController' using context.read()
-                final chatController = context.read<ChatController>();
-
-                // create a new conversation and navigate to it
-                chatController.createNewConversation(context);  // Pass context to createNewConversation
-              },
+              ],
 
             ),
 
-          ],
+          ),  // end of 'Scaffold' widget
 
-        ),
-
-        drawer: Drawer(
-
-          child: SavedConversationsTab(userEmail: currentUserEmail), // add 'SavedConversationsTab' as drawer content
-
-        ),
-
-        body: ChatTab(userEmail: currentUserEmail),  // only 'ChatTab' in body of page
-
-      ),  // end of 'Scaffold' widget
-
-    );  // end of 'ChangeNotifierProvider'
+        );  // end of 'ChangeNotifierProvider'
+      },
+    ); // end of 'LayoutBuilder'
   }  // end 'build' method
-}  // end of 'ChatScreen' class
+}  // end of '_ChatScreenState' class
