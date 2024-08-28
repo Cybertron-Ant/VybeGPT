@@ -10,7 +10,7 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
 
   // method to get all conversations for a user
   // this returns a stream of snapshots from the conversations collection
-  Stream<QuerySnapshot> getConversationsStream(String userEmail) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getConversationsStream(String userEmail) {
     return _firestore
         .collection('users')  // Firestore collection for users
         .doc(userEmail)  // document for specific user
@@ -22,7 +22,7 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
 
   // method to get a specific conversation by id for a user
   // this returns a future of the document snapshot for the conversation
-  Future<DocumentSnapshot> getConversation(String userEmail, String conversationId) {
+  Future<DocumentSnapshot<Map<String, dynamic>>> getConversation(String userEmail, String conversationId) {
     return _firestore
         .collection('users')  // Firestore collection for users
         .doc(userEmail)  // document for specific user
@@ -122,5 +122,60 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
     } // end 'CATCH'
 
   }  // end of 'updateConversationTitle' method
+
+  // method to load conversations with pagination
+  // this returns a list of conversations for a user with support for pagination
+  Future<List<Conversation>> loadConversations(String userEmail, {int offset = 0, int limit = 15}) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+
+      if (offset > 0) {
+        final lastDocument = await _getLastDocument(userEmail, offset);
+        querySnapshot = await _firestore
+            .collection('users')  // Firestore collection for users
+            .doc(userEmail)  // document for specific user
+            .collection('conversations')  // subcollection for conversations
+            .orderBy('lastModified', descending: true)  // order conversations by 'lastModified' in descending order
+            .startAfterDocument(lastDocument)  // pagination start
+            .limit(limit)  // limit the number of conversations loaded
+            .get();  // get conversations for user with pagination
+      } else {
+        querySnapshot = await _firestore
+            .collection('users')  // Firestore collection for users
+            .doc(userEmail)  // document for specific user
+            .collection('conversations')  // subcollection for conversations
+            .orderBy('lastModified', descending: true)  // order conversations by 'lastModified' in descending order
+            .limit(limit)  // limit the number of conversations loaded
+            .get();  // get conversations for user with pagination
+      }
+
+      return querySnapshot.docs.map((doc) => Conversation.fromDocument(doc)).toList();  // map query result to conversation list
+
+    } catch (e) {
+
+      if (kDebugMode) {
+        print('Error loading conversations: $e');
+      }  // log error if loading fails
+
+      rethrow;  // rethrow exception to be handled by the caller
+
+    } // end 'CATCH'
+
+  }  // end of 'loadConversations' method
+
+  // helper method to get the last document for pagination
+  // this method fetches the last document based on offset
+  Future<DocumentSnapshot<Map<String, dynamic>>> _getLastDocument(String userEmail, int offset) async {
+    final querySnapshot = await _firestore
+        .collection('users')  // Firestore collection for users
+        .doc(userEmail)  // document for specific user
+        .collection('conversations')  // subcollection for conversations
+        .orderBy('lastModified', descending: true)  // order conversations by 'lastModified' in descending order
+        .limit(offset)  // limit to the offset value
+        .get();  // get the last document for pagination
+
+    return querySnapshot.docs.last;  // return the last document snapshot
+
+  }  // end of '_getLastDocument' helper method
 
 }  // end of 'ConversationRepository' class

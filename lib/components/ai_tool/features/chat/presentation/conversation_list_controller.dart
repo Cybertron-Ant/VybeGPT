@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';  // for state management
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // conversation service
@@ -9,6 +10,10 @@ class ConversationListController extends ChangeNotifier {  // controller for man
   late Stream<List<Conversation>> _conversationsStream;  // stream of conversations
   List<Conversation> _conversations = [];  // list of conversations
   String? _selectedConversationId;  // ID of the selected conversation
+  bool _isLoading = false;  // loading state
+  bool _hasMore = true;  // flag to check if more data is available
+  int _offset = 0;  // current offset for pagination
+  final int _limit = 15;  // number of conversations to load per request
 
   // constructor initializing the 'ConversationService' service
   ConversationListController(this._service);  // initialize with the provided ConversationService
@@ -52,5 +57,41 @@ class ConversationListController extends ChangeNotifier {  // controller for man
     // additional logic (if needed) to handle selected conversation
     // example: fetch detailed information or update UI
   }
+
+  // method to load more conversations with pagination
+  Future<void> loadMoreConversations(String userEmail) async {
+
+    if (_isLoading || !_hasMore) return;  // return if already loading or no more data
+
+    _isLoading = true;  // set loading state
+    notifyListeners();  // notify listeners about the loading state change
+
+    try {
+
+      final newConversations = await _service.loadConversations(
+        userEmail,
+        offset: _offset,
+        limit: _limit,
+      );
+
+      if (newConversations.isEmpty) {
+        _hasMore = false;  // no more data available
+      } else {
+        _offset += newConversations.length;  // update offset
+        _conversations.addAll(newConversations);  // add new conversations to the list
+      } // end ELSE
+
+    } catch (e) {
+      // handle error (if needed)
+      if (kDebugMode) {
+        print(e);
+      }
+
+    } finally {
+      _isLoading = false;  // reset loading state
+      notifyListeners();  // notify listeners about the loading state change
+    } // end 'FINALLY'
+
+  } // end 'loadMoreConversations' method
 
 }  // end of 'ConversationListController' class

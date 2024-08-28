@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';  // for state management
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
 
@@ -14,11 +14,11 @@ class ConversationService extends ChangeNotifier {  // service for managing conv
   Stream<List<Conversation>> getConversationsStream(String userEmail) {
 
     return _repository.getConversationsStream(userEmail)  // get the stream from the repository
-        // map snapshot to list of conversations
+    // map snapshot to list of conversations
         .map((snapshot) => snapshot.docs
-         // create Conversation objects from document data
+    // create Conversation objects from document data
         .map((doc) => Conversation.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-        // convert to list
+    // convert to list
         .toList());
 
   }  // end of 'getConversationsStream' method
@@ -40,5 +40,11 @@ class ConversationService extends ChangeNotifier {  // service for managing conv
     return _repository.saveConversation(userEmail, conversation);  // save conversation using repository
 
   }  // end of 'saveConversation' method
+
+  // method to load conversations with pagination
+  Future<List<Conversation>> loadConversations(String userEmail, {int offset = 0, int limit = 15}) async {
+    final conversations = await _repository.loadConversations(userEmail, offset: offset, limit: limit);  // fetch data from repository
+    return conversations;  // return the list of conversations directly
+  }  // end of 'loadConversations' method
 
 }  // end of 'ConversationService' class
