@@ -3,15 +3,17 @@ import 'package:towers/components/ai_tool/core/constants/api_constants.dart';  /
 
 
 class ChatInputField extends StatelessWidget {
-  // declare final variables for text editing controller and send button callback
+  // declare final variables for text editing controller, send button callback, and chat controller
   final TextEditingController controller;
   final VoidCallback onSend;
+  final dynamic chatController;
 
-  // constructor for the widget, requiring 'controller' & 'onSend' parameters
+  // constructor for the widget, requiring 'controller', 'onSend', and 'chatController' parameters
   const ChatInputField({
     super.key,
     required this.controller,
     required this.onSend,
+    required this.chatController,
   }); // end of constructor
 
   @override
@@ -79,12 +81,17 @@ class ChatInputField extends StatelessWidget {
                           contentPadding: EdgeInsets.symmetric(horizontal: 16.0),  // add horizontal padding to the text
                         ), // end of text field decoration
 
+                        onSubmitted: (prompt) {
+                          // call 'onUserPromptSubmitted()' method when user submits a prompt
+                          chatController.onUserPromptSubmitted(prompt);
+                        }, // end 'onSubmitted' callback
+
                       ), // end of text field
                     ), // end of 'single child scroll view'
                   ),  // end of constrained box
                 ),  // end of expanded widget
 
-                const SizedBox(width: 8.0), // add spacing between text field &77 button
+                const SizedBox(width: 8.0), // add spacing between text field & button
 
                 GestureDetector(
                   onTap: onSend, // set the callback for the send button

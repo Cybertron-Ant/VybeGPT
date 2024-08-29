@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
 import 'package:towers/components/ai_tool/core/widgets/chat_input_field.dart';  // Import the new ChatInputField
 
@@ -26,30 +27,41 @@ class ChatTab extends StatelessWidget {
             // define the list of child widgets for the column
             children: [  // list of child widgets in the column
 
-              // add an 'Expanded' widget to allow the response text to scroll
-              Expanded(  // expanded to make the response scrollable
+              // check if there are any messages
+              if (chatController.messages.isEmpty)  // 'no messages' case
+                Expanded(  // expanded to take available space
+                  child: Center(  // center the placeholder image
+                    child: ClipOval(  // clip the image to be circular
+                      child: Image.asset(  // load placeholder image
+                        brandImage,  // path to placeholder image
+                        width: 100.0,  // set width of the circular image
+                        height: 100.0,  // set height of the circular image
+                        fit: BoxFit.cover,  // cover the circular bounds
+                      ),
+                    ),
+                  ),
+                )
 
-                // wrap the response text in a 'SingleChildScrollView'
-                child: SingleChildScrollView(  // scroll view for response text
+              else  // show messages case
+                Expanded(  // expanded to make the response scrollable
+                  child: SingleChildScrollView(  // scroll view for response text
+                    child: Column(  // Use Column to display multiple messages
+                      crossAxisAlignment: CrossAxisAlignment.start,  // align messages to the start
 
-                  // display the response text using a Text widget
-                  child: Column(  // Use Column to display multiple messages
-                    crossAxisAlignment: CrossAxisAlignment.start,  // align messages to the start
+                      children: [
 
-                    children: [
+                        // show existing messages if available
+                        ...chatController.messages.map((message) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),  // padding around each message
+                          child: Text('$userEmail: $message'),  // Display each message with user's email
+                        )),
 
-                      // show existing messages if available
-                      ...chatController.messages.map((message) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),  // padding around each message
-                        child: Text('$userEmail: $message'),  // Display each message user's email
-                      )),
+                      ],
+                    ),  // end of 'Column' widget
 
-                    ],
-                  ),  // end of 'Column' widget
+                  ),  // end of 'SingleChildScrollView' widget
 
-                ),  // end of 'SingleChildScrollView' widget
-
-              ),  // end of 'Expanded' widget
+                ),  // end of 'Expanded' widget
 
               // input field positioned at the bottom of the page
               Padding(
@@ -59,6 +71,7 @@ class ChatTab extends StatelessWidget {
                   child: ChatInputField(
                     controller: chatController.inputController, // pass input controller
                     onSend: () => chatController.generateResponse(context), // pass the 'onSend' callback
+                    chatController: chatController,  // pass the 'chatController'
                   ),
                 ),
               ),

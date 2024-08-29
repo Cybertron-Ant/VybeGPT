@@ -10,3 +10,4 @@ const String GEMINI_MODEL = "gemini-1.5-flash";  // this is the model version fo
 
 const String configurationJSON = "assets/config.json";
 const String messageGazaGpt = "Message GazaGPT";
+const String brandImage = "assets/images/streetvybezgpt.jpg";

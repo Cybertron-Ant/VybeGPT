@@ -23,6 +23,7 @@ class ChatController extends ChangeNotifier {
   String _responseText = '';  // stores generated response text
   final List<String> _messages = [];  // list of messages in the conversation
   Conversation? _currentConversation;  // current active conversation
+  bool isConversationActive = false;  // track if a conversation is active
 
   // constructor for initializing the ChatController with required services
   ChatController(
@@ -97,6 +98,7 @@ class ChatController extends ChangeNotifier {
         throw ArgumentError('User email cannot be empty');  // throw error if user email is empty
       }
 
+      isConversationActive = true;  // set active when a conversation is started
       notifyListeners();  // notify listeners of state changes
     }
   }
@@ -107,6 +109,7 @@ class ChatController extends ChangeNotifier {
     _currentConversation = conversation;  // set current conversation
     _messages.clear();  // clear existing messages
     _messages.addAll(conversation.messages);  // add messages from the conversation
+    isConversationActive = true;  // set active when a conversation is initialized
     notifyListeners();  // notify listeners of state changes
 
   }
@@ -115,6 +118,7 @@ class ChatController extends ChangeNotifier {
   void resetConversation() {
     _currentConversation = null;  // clear current conversation
     _messages.clear();  // clear messages
+    isConversationActive = false;  // set inactive when the conversation is reset
     notifyListeners();  // notify listeners of state changes
   }
 
@@ -137,6 +141,9 @@ class ChatController extends ChangeNotifier {
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
     final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
     final userEmail = googleSignInProvider.userEmail ?? emailSignInProvider.user!.email!;
+
+    isConversationActive = true;  // set active when a new conversation is created
+    notifyListeners();  // notify listeners of state changes
 
     // Navigate to 'ChatScreen' with the new conversation and user email
     Navigator.push(
