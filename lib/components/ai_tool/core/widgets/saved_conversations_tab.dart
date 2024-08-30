@@ -135,43 +135,49 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
 
         final conversation = _conversations[index];  // get conversation at index
 
-        return ListTile(
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(2.0, 2.5, 2.0, 2.5,),
 
-          title: Text(
-            // display only the first 50 characters & add an ellipsis if needed
-            conversation.title.length > 50
-                ? '${conversation.title.substring(0, 50)}...'  // truncate & add ellipsis
-                : conversation.title,  // full title
-            overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
-            maxLines: 1,  // limit text to one line
-          ),
+          child: ListTile(
 
-          onTap: () {
+            title: Text(
+              // display only the first 50 characters & add an ellipsis if needed
+              conversation.title.length > 50
+                  ? '${conversation.title.substring(0, 50)}...'  // truncate & add ellipsis
+                  : conversation.title,  // full title
+              overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
+              maxLines: 1,  // limit text to one line
+            ),
 
-            // navigate to 'ChatScreen' & pass the conversation data
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                // pass 'conversation' & 'userEmail' to 'ChatScreen'
-                builder: (context) => ChatScreen(
-                  conversation: conversation,
-                  userEmail: widget.userEmail,
+            subtitle: const Text(""),
+
+            onTap: () {
+
+              // navigate to 'ChatScreen' & pass the conversation data
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // pass 'conversation' & 'userEmail' to 'ChatScreen'
+                  builder: (context) => ChatScreen(
+                    conversation: conversation,
+                    userEmail: widget.userEmail,
+                  ),
                 ),
-              ),
-            );
-          }, // end 'onTap'
+              );
+            }, // end 'onTap'
 
-          onLongPress: () {
-            // show a dialog to edit the title using the extracted logic
-            showEditConversationDialog(
-              context: context,
-              userEmail: widget.userEmail,
-              conversationId: conversation.id,
-              initialTitle: conversation.title,
+            onLongPress: () {
+              // show a dialog to edit the title using the extracted logic
+              showEditConversationDialog(
+                context: context,
+                userEmail: widget.userEmail,
+                conversationId: conversation.id,
+                initialTitle: conversation.title,
 
-            );
-          }, // end 'onLongPress'
+              );
+            }, // end 'onLongPress'
 
+          ),
         );
       }, // end 'builder' method
     );
