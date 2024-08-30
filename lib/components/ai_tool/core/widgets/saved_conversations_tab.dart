@@ -146,15 +146,6 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
             maxLines: 1,  // limit text to one line
           ),
 
-          subtitle: Text(
-            // display only the first 50 characters and add an ellipsis if needed
-            conversation.lastMessage.length > 50
-                ? '${conversation.lastMessage.substring(0, 50)}...'  // truncate and add ellipsis
-                : conversation.lastMessage,  // full last message
-            overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
-            maxLines: 1,  // limit text to one line
-          ),
-
           onTap: () {
 
             // navigate to 'ChatScreen' & pass the conversation data
@@ -162,8 +153,10 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
               context,
               MaterialPageRoute(
                 // pass 'conversation' & 'userEmail' to 'ChatScreen'
-                builder: (context) => ChatScreen(conversation: conversation, userEmail: widget.userEmail),
-
+                builder: (context) => ChatScreen(
+                  conversation: conversation,
+                  userEmail: widget.userEmail,
+                ),
               ),
             );
           }, // end 'onTap'
