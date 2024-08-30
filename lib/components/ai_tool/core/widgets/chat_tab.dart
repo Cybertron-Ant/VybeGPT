@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
-import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
+import 'package:towers/components/ai_tool/features/chat/controllers/chat_controller.dart';
 import 'package:towers/components/ai_tool/core/widgets/chat_input_field.dart';  // Import the new ChatInputField
 
 class ChatTab extends StatelessWidget {

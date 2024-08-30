@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';  // for provider package
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';  // for conversation repository
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for conversation service
 import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for response generation service
-import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';  // for chat controller
+import 'package:towers/components/ai_tool/features/chat/controllers/chat_controller.dart';  // for chat controller
 import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';  // for email sign-in provider
 import 'package:towers/components/email_sign_in/providers/email_user_provider.dart';  // for email user provider
 import 'package:towers/components/facebook_sign_in/providers/facebook_sign_in_provider.dart';  // for Facebook sign-in provider

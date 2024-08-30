@@ -7,7 +7,7 @@ import 'package:towers/components/ai_tool/features/chat/data/gemini_repository.d
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for conversation service
 import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for response generation service
-import 'package:towers/components/ai_tool/features/chat/presentation/chat_controller.dart';
+import 'package:towers/components/ai_tool/features/chat/controllers/chat_controller.dart';
 import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/login_system/screens/LoginPage.dart';
