@@ -178,4 +178,21 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
 
   }  // end of '_getLastDocument' helper method
 
+  // method to delete a conversation
+  Future<void> deleteConversation(String userEmail, String conversationId) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userEmail)
+          .collection('conversations')
+          .doc(conversationId)
+          .delete();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting conversation: $e');
+      }
+      rethrow;
+    }
+  } // end of 'deleteConversation' helper method
+
 }  // end of 'ConversationRepository' class

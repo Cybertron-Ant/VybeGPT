@@ -22,12 +22,35 @@ Future<void> showEditConversationDialog({
     builder: (BuildContext context) {
 
       return AlertDialog(
-        title: const Text('Edit Conversation Title'),  // dialog title
+        title: const Text('Edit Conversation'),  // dialog title (modified)
 
-        content: TextField(
-          controller: titleController,  // controller for the text field
-          decoration: const InputDecoration(hintText: 'Enter new title'),  // hint text for the text field
-        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,  // controller for the text field
+              decoration: const InputDecoration(hintText: 'Enter new title'),  // hint text for the text field
+            ),
+            const SizedBox(height: 16),
+            // Delete button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, // Red color for delete
+              ),
+              onPressed: () async {
+                // Delete the conversation from Firestore
+                await Provider.of<ConversationRepository>(context, listen: false)
+                    .deleteConversation(userEmail, conversationId);
+                if (context.mounted) {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // You might want to add navigation logic here
+                  // to go back to the previous screen after deletion
+                }
+              },
+              child: const Text('Delete Conversation'),
+            ),
+          ],
+        ), 
 
         actions: <Widget>[
 
