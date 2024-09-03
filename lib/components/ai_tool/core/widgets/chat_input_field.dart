@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
-import 'package:towers/components/ai_tool/core/utils/chat_input_utils';  // import the material package for building UI elements
+import 'package:towers/components/ai_tool/core/widgets/build_send_button'; // import the material package for building UI elements
 
 
 class ChatInputField extends StatefulWidget {
   // declare final variables for text editing controller, send button callback, and chat controller
   final TextEditingController controller;
-  final VoidCallback onSend;
+
+  final Future<void> Function()
+      onSend; // change to Future<void> Function() to handle async operation
+
   final dynamic chatController;
 
   // constructor for the widget, requiring 'controller', 'onSend', and 'chatController' parameters
@@ -23,6 +26,7 @@ class ChatInputField extends StatefulWidget {
 
 class _ChatInputFieldState extends State<ChatInputField> {
   late final ValueNotifier<bool> _isTextEmptyNotifier;
+  bool _isLoading = false; // new state variable for tracking loading state
 
   @override
   void initState() {
@@ -39,6 +43,24 @@ class _ChatInputFieldState extends State<ChatInputField> {
   void dispose() {
     _isTextEmptyNotifier.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSend() async {
+    setState(() {
+      _isLoading = true; // set loading to true
+    });
+
+    try {
+      await widget.onSend(); // call the async send function
+    } finally {
+      setState(() {
+        _isLoading = false; // set loading to 'false' after the response
+      });
+    }
+
+    // clear input field after sending the message/prompt
+    widget.controller.clear();
+    _isTextEmptyNotifier.value = true;
   }
 
   @override
@@ -109,12 +131,8 @@ class _ChatInputFieldState extends State<ChatInputField> {
                         onSubmitted: (prompt) {
                           // call 'onUserPromptSubmitted()' method when user submits a prompt
                           widget.chatController.onUserPromptSubmitted(prompt);
-                          // clear the input field using utility function
-                          handleSend(
-                            widget.controller,
-                            widget.onSend,
-                            _isTextEmptyNotifier,
-                          );
+                          // handle the 'send' action
+                          _handleSend();
                         }, // end 'onSubmitted' callback
 
                       ), // end of text field
@@ -127,25 +145,14 @@ class _ChatInputFieldState extends State<ChatInputField> {
                 ValueListenableBuilder<bool>(
                   valueListenable: _isTextEmptyNotifier,
                   builder: (context, isTextEmpty, child) {
-                    return GestureDetector(
-                      onTap: isTextEmpty ? null : () => handleSend(
-                        widget.controller,
-                        widget.onSend,
-                        _isTextEmptyNotifier,
-                      ), // set the callback for the send button
-                      child: Container(
-                        width: 42,  // set the width of the icon button container
-                        height: 42,  // set the height of the icon button container
 
-                        decoration: BoxDecoration(
-                          color: isTextEmpty ? Colors.grey : Colors.black,  // set the background color of the send button
-                          shape: BoxShape.circle,  // make the button circular
-                        ), // end of box decoration
-
-                        child: const Icon(Icons.send, color: Colors.white),  // add a send icon to the button
-                      ), // end of send button container
-                    ); // end of gesture detector
+                    return buildSendButton(
+                      isTextEmpty: isTextEmpty,
+                      isLoading: _isLoading,
+                      onSend: _handleSend,
+                    ); // use utility function to build the 'send' button
                   },
+
                 ), // end of ValueListenableBuilder
 
               ], // end of row 'children' list

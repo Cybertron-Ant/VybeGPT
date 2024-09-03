@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+
+
+// utility function to build the send button with progress indicator or send icon
+Widget buildSendButton({
+  required bool isTextEmpty,
+  required bool isLoading,
+  required VoidCallback? onSend,
+}) {
+  return GestureDetector(
+    onTap: isTextEmpty || isLoading ? null : onSend, // set the callback for the send button
+
+    child: Container(
+      width: 42, // set width of the icon button container
+      height: 42, // set height of the icon button container
+
+      decoration: BoxDecoration(
+        color: isTextEmpty || isLoading
+            ? Colors.grey
+            : Colors.black, // set the background color of the send button
+        shape: BoxShape.circle, // make the button circular
+      ), // end of box decoration
+
+      child: isLoading
+          ? const CircularProgressIndicator(
+              strokeWidth: 3.0,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            )
+          : const Icon(Icons.send, color: Colors.white), // add a send icon or progress indicator to the button
+    ), // end of 'send' button container
+
+  ); // end of gesture detector
+
+} // end 'buildSendButton' function
