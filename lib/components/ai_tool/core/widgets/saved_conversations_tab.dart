@@ -107,16 +107,25 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
       }
     }
   }
+  
+  // method to refresh the conversations list
+  void _refreshConversations() {
+    _offset = 0; // reset the offset for loading from the beginning
+    _conversations = []; // clear the current list of conversations
+    _loadInitialConversations(); // reload the conversations
+  }
 
   @override
   void dispose() {
     _isMounted = false; // set the flag to 'false' when disposing the widget
-    _scrollController.dispose();
+    
+_scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return ListView.builder(
 
       controller: _scrollController,
@@ -124,6 +133,7 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
       itemBuilder: (context, index) {
 
         if (index == _conversations.length) {
+
           // show a loading indicator at the end of the list
           return _isLoading
               ? const Padding(
@@ -163,7 +173,7 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
                     userEmail: widget.userEmail,
                   ),
                 ),
-              );
+              ).then((_) => _refreshConversations()); // Refresh the list after returning from ChatScreen
             }, // end 'onTap'
 
             onLongPress: () {
@@ -174,7 +184,7 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
                 conversationId: conversation.id,
                 initialTitle: conversation.title,
 
-              );
+              ).then((_) => _refreshConversations()); // Refresh the list after editing or deleting
             }, // end 'onLongPress'
 
           ),
