@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:towers/components/ai_tool/core/constants/api_constants.dart';  // import the material package for building UI elements
 
 
-class ChatInputField extends StatelessWidget {
+class ChatInputField extends StatefulWidget {
   // declare final variables for text editing controller, send button callback, and chat controller
   final TextEditingController controller;
   final VoidCallback onSend;
@@ -15,6 +15,30 @@ class ChatInputField extends StatelessWidget {
     required this.onSend,
     required this.chatController,
   }); // end of constructor
+
+  @override
+  _ChatInputFieldState createState() => _ChatInputFieldState();
+}
+
+class _ChatInputFieldState extends State<ChatInputField> {
+  late final ValueNotifier<bool> _isTextEmptyNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _isTextEmptyNotifier = ValueNotifier(widget.controller.text.isEmpty);
+
+    // Listen to changes in the text field and update the notifier
+    widget.controller.addListener(() {
+      _isTextEmptyNotifier.value = widget.controller.text.isEmpty;
+    });
+  }
+
+  @override
+  void dispose() {
+    _isTextEmptyNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +94,7 @@ class ChatInputField extends StatelessWidget {
                       reverse: true, // start scrolling from the bottom
 
                       child: TextField(
-                        controller: controller, // bind the text field to the controller
+                        controller: widget.controller, // bind the text field to the controller
                         maxLines: null, // allow the text field to expand vertically
                         minLines: 1, // set minimum number of lines
                         keyboardType: TextInputType.multiline, // set keyboard type to 'multiline'
@@ -83,7 +107,7 @@ class ChatInputField extends StatelessWidget {
 
                         onSubmitted: (prompt) {
                           // call 'onUserPromptSubmitted()' method when user submits a prompt
-                          chatController.onUserPromptSubmitted(prompt);
+                          widget.chatController.onUserPromptSubmitted(prompt);
                         }, // end 'onSubmitted' callback
 
                       ), // end of text field
@@ -93,20 +117,25 @@ class ChatInputField extends StatelessWidget {
 
                 const SizedBox(width: 8.0), // add spacing between text field & button
 
-                GestureDetector(
-                  onTap: onSend, // set the callback for the send button
-                  child: Container(
-                    width: 42,  // set the width of the icon button container
-                    height: 42,  // set the height of the icon button container
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isTextEmptyNotifier,
+                  builder: (context, isTextEmpty, child) {
+                    return GestureDetector(
+                      onTap: isTextEmpty ? null : widget.onSend, // set the callback for the send button
+                      child: Container(
+                        width: 42,  // set the width of the icon button container
+                        height: 42,  // set the height of the icon button container
 
-                    decoration: const BoxDecoration(
-                      color: Colors.black,  // set the background color of the send button
-                      shape: BoxShape.circle,  // make the button circular
-                    ), // end of box decoration
+                        decoration: BoxDecoration(
+                          color: isTextEmpty ? Colors.grey : Colors.black,  // set the background color of the send button
+                          shape: BoxShape.circle,  // make the button circular
+                        ), // end of box decoration
 
-                    child: const Icon(Icons.send, color: Colors.white),  // add a send icon to the button
-                  ), // end of send button container
-                ), // end of gesture detector
+                        child: const Icon(Icons.send, color: Colors.white),  // add a send icon to the button
+                      ), // end of send button container
+                    ); // end of gesture detector
+                  },
+                ), // end of ValueListenableBuilder
 
               ], // end of row 'children' list
 
