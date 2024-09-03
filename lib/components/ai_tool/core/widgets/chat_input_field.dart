@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:towers/components/ai_tool/core/constants/api_constants.dart';  // import the material package for building UI elements
+import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
+import 'package:towers/components/ai_tool/core/utils/chat_input_utils';  // import the material package for building UI elements
 
 
 class ChatInputField extends StatefulWidget {
@@ -108,6 +109,12 @@ class _ChatInputFieldState extends State<ChatInputField> {
                         onSubmitted: (prompt) {
                           // call 'onUserPromptSubmitted()' method when user submits a prompt
                           widget.chatController.onUserPromptSubmitted(prompt);
+                          // clear the input field using utility function
+                          handleSend(
+                            widget.controller,
+                            widget.onSend,
+                            _isTextEmptyNotifier,
+                          );
                         }, // end 'onSubmitted' callback
 
                       ), // end of text field
@@ -121,7 +128,11 @@ class _ChatInputFieldState extends State<ChatInputField> {
                   valueListenable: _isTextEmptyNotifier,
                   builder: (context, isTextEmpty, child) {
                     return GestureDetector(
-                      onTap: isTextEmpty ? null : widget.onSend, // set the callback for the send button
+                      onTap: isTextEmpty ? null : () => handleSend(
+                        widget.controller,
+                        widget.onSend,
+                        _isTextEmptyNotifier,
+                      ), // set the callback for the send button
                       child: Container(
                         width: 42,  // set the width of the icon button container
                         height: 42,  // set the height of the icon button container
