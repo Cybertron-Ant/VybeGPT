@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
 import 'package:towers/components/ai_tool/features/chat/controllers/chat_controller.dart';
-import 'package:towers/components/ai_tool/core/widgets/chat_input_field.dart';  // Import the new ChatInputField
+import 'package:towers/components/ai_tool/core/widgets/chat_input_field.dart';  // import the new ChatInputField
 
 class ChatTab extends StatelessWidget {
   final String userEmail;  // user email to be passed to the widget
@@ -15,64 +16,185 @@ class ChatTab extends StatelessWidget {
 
       // builder method to rebuild UI whenever ChatController notifies listeners
       builder: (context, chatController, _) {  // builder method for UI updates
+        ScrollController _scrollController = ScrollController();  // create a scroll controller
 
-        // return a Padding widget to add spacing around the content
-        return Padding(  // add padding around the content
+        return Scaffold(
+          body: Column(
 
-          // specify the amount of padding to apply
-          padding: const EdgeInsets.all(16.0),  // padding around the column
+            children: [
 
-          child: Column(  // 'Column' to arrange widgets vertically
+              Expanded(
+                child: chatController.messages.isEmpty
 
-            // define the list of child widgets for the column
-            children: [  // list of child widgets in the column
-
-              // check if there are any messages
-              if (chatController.messages.isEmpty)  // 'no messages' case
-                Expanded(  // expanded to take available space
-                  child: Center(  // center the placeholder image
-                    child: ClipOval(  // clip the image to be circular
-                      child: Image.asset(  // load placeholder image
-                        brandImage,  // path to placeholder image
-                        width: 100.0,  // set width of the circular image
-                        height: 100.0,  // set height of the circular image
-                        fit: BoxFit.cover,  // cover the circular bounds
-                      ),
+                    ? Center(  // center the placeholder image when there are no messages
+                  child: ClipOval(
+                    child: Image.asset(
+                      brandImage,  // path to placeholder image
+                      width: 100.0,  // set width of the circular image
+                      height: 100.0,  // set height of the circular image
+                      fit: BoxFit.cover,  // cover the circular bounds
                     ),
                   ),
                 )
+                    : Scrollbar(
+                  controller: _scrollController,  // associate scrollbar with scroll controller
 
-              else  // show messages case
-                Expanded(  // expanded to make the response scrollable
-                  child: SingleChildScrollView(  // scroll view for response text
-                    child: Column(  // Use Column to display multiple messages
-                      crossAxisAlignment: CrossAxisAlignment.start,  // align messages to the start
+                  child: SingleChildScrollView(
+                    controller: _scrollController,  // associate 'singlechildscrollview' with scroll controller
 
-                      children: [
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),  // padding around the column
 
-                        // show existing messages if available
-                        ...chatController.messages.map((message) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),  // padding around each message
-                          child: Text('$userEmail: $message'),  // Display each message with user's email
-                        )),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
 
-                      ],
-                    ),  // end of 'Column' widget
+                        children: chatController.messages.map((message) {
+                          //final isUserMessage = chatController.messages.indexOf(message) % 2 == 0; // TODO
 
-                  ),  // end of 'SingleChildScrollView' widget
+                          // split the message into code and non-code parts
+                          final codeRegExp = RegExp(r'```(.*?)```', dotAll: true);
+                          final matches = codeRegExp.allMatches(message);
+                          final nonCodeParts = <String>[];
+                          final codeParts = <String>[];
+                          int lastIndex = 0;
 
-                ),  // end of 'Expanded' widget
+                          for (final match in matches) {
+
+                            if (match.start > lastIndex) {
+                              nonCodeParts.add(message.substring(lastIndex, match.start));
+                            }
+                            codeParts.add(match.group(1)!);
+                            lastIndex = match.end;
+                          } // end FOR
+
+                          if (lastIndex < message.length) {
+                            nonCodeParts.add(message.substring(lastIndex));
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: PADDING_VERTICAL_12),  // vertical padding for more space
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                              children: [
+
+                                // show non-code parts in UI
+                                for (final part in nonCodeParts)
+                                  if (part.isNotEmpty)
+
+                                    Container(
+                                      padding: const EdgeInsets.all(PADDING_VERTICAL_12),
+                                      margin: const EdgeInsets.only(bottom: PADDING_ONLY_BOTTOM_16),  // increased space between containers
+
+                                      decoration: BoxDecoration(
+                                        color: AI_RESPONSE_COLOR,  // set background color to black for ai responses
+                                        borderRadius: BorderRadius.circular(8.0),
+                                      ),
+
+                                      constraints: BoxConstraints(
+                                        maxWidth: MediaQuery.of(context).size.width * 0.7,
+                                      ),
+
+                                      child: Stack(
+
+                                        children: [
+
+                                          Text(
+                                            part,
+                                            style: const TextStyle(
+                                              color: AI_TEXT_COLOR,  // set text color to white for contrast
+                                            ),
+                                            overflow: TextOverflow.clip,
+                                          ),
+
+                                          Positioned(
+                                            top: 8.0,
+                                            right: 8.0,
+
+                                            child: IconButton(
+                                              icon: const Icon(Icons.copy, color: Colors.white),
+
+                                              onPressed: () {
+                                                Clipboard.setData(ClipboardData(text: part));
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text(SNACKBAR_COPIED_TO_CLIPBOARD)),
+                                                );
+                                              },
+                                            ),
+                                          ),
+
+                                        ],
+
+                                      ),
+                                    ),
+
+                                // show code parts in UI
+                                for (final code in codeParts)
+                                  if (code.isNotEmpty)
+
+                                    Container(
+                                      padding: const EdgeInsets.all(PADDING_VERTICAL_12),
+                                      margin: const EdgeInsets.only(bottom: PADDING_ONLY_BOTTOM_16),  // increased space between containers
+
+                                      decoration: BoxDecoration(
+                                        color: AI_RESPONSE_COLOR,  // set background color to black for code parts
+                                        borderRadius: BorderRadius.circular(8.0),
+                                      ),
+
+                                      constraints: BoxConstraints(
+                                        maxWidth: MediaQuery.of(context).size.width * 0.7,
+                                      ),
+
+                                      child: Stack(
+                                        children: [
+
+                                          Text(
+                                            code,
+                                            style: const TextStyle(
+                                              color: AI_TEXT_COLOR,  // set text color to white for code parts
+                                              fontFamily: COURIER_FONT_FAMILY,  // use a monospaced font for code
+                                            ),
+                                            overflow: TextOverflow.clip,
+                                          ),
+
+                                          Positioned(
+                                            top: 8.0,
+                                            right: 8.0,
+
+                                            child: IconButton(
+                                              icon: const Icon(Icons.copy, color: Colors.white),
+
+                                              onPressed: () {
+                                                Clipboard.setData(ClipboardData(text: code));
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text(SNACKBAR_COPIED_TO_CLIPBOARD)),
+                                                );
+                                              }, // end 'onPressed()'
+                                            ),
+
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
               // input field positioned at the bottom of the page
               Padding(
-                padding: const EdgeInsets.only(bottom: 16.0), // add bottom padding
-
-                child: Center(
-                  child: ChatInputField(
-                    controller: chatController.inputController, // pass input controller
-                    onSend: () => chatController.generateResponse(context), // pass the 'onSend' callback
-                    chatController: chatController,  // pass the 'chatController'
-                  ),
+                padding: const EdgeInsets.only(bottom: PADDING_ONLY_BOTTOM_16), // add bottom padding
+                child: ChatInputField(
+                  controller: chatController.inputController, // pass input controller
+                  onSend: () => chatController.generateResponse(context), // pass the 'onSend' callback
+                  chatController: chatController,  // pass the 'chatController'
                 ),
               ),
 
