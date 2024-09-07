@@ -20,11 +20,13 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
   late final ConversationRepository _conversationRepository;
   late final ScrollController _scrollController;
   List<Conversation> _conversations = [];  // list of conversations
+  List<Conversation> _filteredConversations = []; // list of filtered conversations
   bool _isLoading = false;  // loading state
   bool _hasMore = true;  // flag to check if more data is available
   int _offset = 0;  // current offset for pagination
   final int _limit = 15;  // number of conversations to load per request
   bool _isMounted = false; // Flag to check if the widget is mounted
+  final TextEditingController _searchController = TextEditingController(); // search input controller
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
           _loadMoreConversations();
         }
       });
+    _searchController.addListener(_filterConversations); // add listener for search input
     _loadInitialConversations();
   }
 
@@ -56,6 +59,7 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
       if (_isMounted) { // check if the widget is still mounted
         setState(() {
           _conversations = initialConversations;
+          _filteredConversations = _conversations; // initialize filtered list
           _offset += initialConversations.length;
           _hasMore = initialConversations.length == _limit;  // if fewer conversations returned, no more data
         });
@@ -90,6 +94,7 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
       if (_isMounted) { // check if the widget is still mounted
         setState(() {
           _conversations.addAll(newConversations);
+          _filteredConversations = _conversations; // update filtered list
           _offset += newConversations.length;
           _hasMore = newConversations.length == _limit;  // if fewer conversations returned, no more data
         });
@@ -107,89 +112,139 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
       }
     }
   }
-  
-  // method to refresh the conversations list
+
+  void _filterConversations() {
+    final query = _searchController.text.toLowerCase();
+
+    setState(() {
+      _filteredConversations = _conversations.where((conversation) {
+        return conversation.title.toLowerCase().contains(query);
+      }).toList();
+    });
+  } // end '_filterConversations' method
+
+  void _clearSearch() {
+    _searchController.clear(); // clear the text field
+    _filterConversations(); // reset the filtered list
+  }
+
   void _refreshConversations() {
     _offset = 0; // reset the offset for loading from the beginning
     _conversations = []; // clear the current list of conversations
+    _filteredConversations = []; // clear filtered list
     _loadInitialConversations(); // reload the conversations
   }
 
   @override
   void dispose() {
     _isMounted = false; // set the flag to 'false' when disposing the widget
-    
-_scrollController.dispose();
+    _scrollController.dispose();
+    _searchController.dispose(); // dispose the search controller
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    return ListView.builder(
+    return SafeArea( // ensure content is within safe area on smartphones
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
 
-      controller: _scrollController,
-      itemCount: _conversations.length + 1,  // number of items in the list + 1 for the loading indicator
-      itemBuilder: (context, index) {
+        children: [
 
-        if (index == _conversations.length) {
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 600, // adjust max width for larger screens
+              ),
 
-          // show a loading indicator at the end of the list
-          return _isLoading
-              ? const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Center(child: CircularProgressIndicator()),
-          )
-              : const SizedBox.shrink();  // empty widget when not loading
-        } // end IF
+              child: TextField(
+                controller: _searchController,
 
-        final conversation = _conversations[index];  // get conversation at index
-
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(2.0, 2.5, 2.0, 2.5,),
-
-          child: ListTile(
-
-            title: Text(
-              // display only the first 50 characters & add an ellipsis if needed
-              conversation.title.length > 50
-                  ? '${conversation.title.substring(0, 50)}...'  // truncate & add ellipsis
-                  : conversation.title,  // full title
-              overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
-              maxLines: 1,  // limit text to one line
-            ),
-
-            subtitle: const Text(""),
-
-            onTap: () {
-
-              // navigate to 'ChatScreen' & pass the conversation data
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  // pass 'conversation' & 'userEmail' to 'ChatScreen'
-                  builder: (context) => ChatScreen(
-                    conversation: conversation,
-                    userEmail: widget.userEmail,
-                  ),
+                decoration: InputDecoration(
+                  labelText: 'Search Conversations',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: _clearSearch,
+                  )
+                      : const Icon(Icons.search),
                 ),
-              ).then((_) => _refreshConversations()); // Refresh the list after returning from ChatScreen
-            }, // end 'onTap'
-
-            onLongPress: () {
-              // show a dialog to edit the title using the extracted logic
-              showEditConversationDialog(
-                context: context,
-                userEmail: widget.userEmail,
-                conversationId: conversation.id,
-                initialTitle: conversation.title,
-
-              ).then((_) => _refreshConversations()); // Refresh the list after editing or deleting
-            }, // end 'onLongPress'
-
+              ),
+            ),
           ),
-        );
-      }, // end 'builder' method
+
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: _filteredConversations.length + 1,  // number of items in the list + 1 for the loading indicator
+              itemBuilder: (context, index) {
+
+                if (index == _filteredConversations.length) {
+                  // show a loading indicator at the end of the list
+                  return _isLoading
+                      ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                      : const SizedBox.shrink();  // empty widget when not loading
+                } // end IF
+
+                final conversation = _filteredConversations[index];  // get conversation at index
+
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(2.0, 2.5, 2.0, 2.5,),
+
+                  child: ListTile(
+
+                    title: Text(
+                      // display only the first 50 characters & add an ellipsis if needed
+                      conversation.title.length > 50
+                          ? '${conversation.title.substring(0, 50)}...'  // truncate & add ellipsis
+                          : conversation.title,  // full title
+                      overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
+                      maxLines: 1,  // limit text to one line
+                    ),
+
+                    subtitle: const Text(""),
+
+                    onTap: () {
+
+                      // navigate to 'ChatScreen' & pass the conversation data
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          // pass 'conversation' & 'userEmail' to 'ChatScreen'
+                          builder: (context) => ChatScreen(
+                            conversation: conversation,
+                            userEmail: widget.userEmail,
+                          ),
+                        ),
+                      ).then((_) => _refreshConversations()); // Refresh the list after returning from ChatScreen
+                    }, // end 'onTap'
+
+                    onLongPress: () {
+                      // show a dialog to edit the title using the extracted logic
+                      showEditConversationDialog(
+                        context: context,
+                        userEmail: widget.userEmail,
+                        conversationId: conversation.id,
+                        initialTitle: conversation.title,
+
+                      ).then((_) => _refreshConversations()); // Refresh the list after editing or deleting
+                    }, // end 'onLongPress'
+
+                  ),
+                );
+              }, // end 'builder' method
+            ),
+          ),
+
+        ], // end 'children' widget array
+
+      ),
     );
   } // end 'build' overridden method
 
