@@ -46,14 +46,16 @@ class ChatTab extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),  // padding around the column
 
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
 
-                        children: chatController.messages.map((message) {
-                          //final isUserMessage = chatController.messages.indexOf(message) % 2 == 0; // TODO
+                        children: chatController.messages.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final message = entry.value;
+                          final isUserMessage = message.isUser;  // check if the message is from the user
 
                           // split the message into code and non-code parts
                           final codeRegExp = RegExp(r'```(.*?)```', dotAll: true);
-                          final matches = codeRegExp.allMatches(message);
+                          final matches = codeRegExp.allMatches(message.text);
                           final nonCodeParts = <String>[];
                           final codeParts = <String>[];
                           int lastIndex = 0;
@@ -61,14 +63,14 @@ class ChatTab extends StatelessWidget {
                           for (final match in matches) {
 
                             if (match.start > lastIndex) {
-                              nonCodeParts.add(message.substring(lastIndex, match.start));
+                              nonCodeParts.add(message.text.substring(lastIndex, match.start));
                             }
                             codeParts.add(match.group(1)!);
                             lastIndex = match.end;
                           } // end FOR
 
-                          if (lastIndex < message.length) {
-                            nonCodeParts.add(message.substring(lastIndex));
+                          if (lastIndex < message.text.length) {
+                            nonCodeParts.add(message.text.substring(lastIndex));
                           }
 
                           return Padding(
@@ -88,7 +90,7 @@ class ChatTab extends StatelessWidget {
                                       margin: const EdgeInsets.only(bottom: PADDING_ONLY_BOTTOM_16),  // increased space between containers
 
                                       decoration: BoxDecoration(
-                                        color: AI_RESPONSE_COLOR,  // set background color to black for ai responses
+                                        color: isUserMessage ? USER_MESSAGE_COLOR : AI_RESPONSE_COLOR,  // set background color based on message type(user/AI)
                                         borderRadius: BorderRadius.circular(8.0),
                                       ),
 
@@ -102,16 +104,15 @@ class ChatTab extends StatelessWidget {
 
                                           Text(
                                             part,
-                                            style: const TextStyle(
-                                              color: AI_TEXT_COLOR,  // set text color to white for contrast
+                                            style: TextStyle(
+                                              color: isUserMessage ? USER_TEXT_COLOR : AI_TEXT_COLOR,  // set text color based on message type(user/AI)
                                             ),
                                             overflow: TextOverflow.clip,
                                           ),
 
                                           Positioned(
-                                            top: 8.0,
-                                            right: 8.0,
-
+                                            top: 0.0,  // move 'copy' icon to the top
+                                            right: 0.0,  // move 'copy' icon to the right
                                             child: IconButton(
                                               icon: const Icon(Icons.copy, color: Colors.white),
 
@@ -138,7 +139,7 @@ class ChatTab extends StatelessWidget {
                                       margin: const EdgeInsets.only(bottom: PADDING_ONLY_BOTTOM_16),  // increased space between containers
 
                                       decoration: BoxDecoration(
-                                        color: AI_RESPONSE_COLOR,  // set background color to black for code parts
+                                        color: isUserMessage ? USER_MESSAGE_COLOR : AI_RESPONSE_COLOR,  // set background color based on message type(user/AI)
                                         borderRadius: BorderRadius.circular(8.0),
                                       ),
 
@@ -159,9 +160,8 @@ class ChatTab extends StatelessWidget {
                                           ),
 
                                           Positioned(
-                                            top: 8.0,
-                                            right: 8.0,
-
+                                            top: 0.0,  // move 'copy' icon to the top
+                                            right: 0.0,  // move 'copy' icon to the right
                                             child: IconButton(
                                               icon: const Icon(Icons.copy, color: Colors.white),
 

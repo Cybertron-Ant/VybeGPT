@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';  // for Flutter material design widgets
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';  // for Conversation class
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for ConversationService
+import 'package:towers/components/ai_tool/features/chat/domain/message.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for ResponseGenerationService
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';  // for ChatScreen
 import 'package:towers/components/ai_tool/features/chat/utils/title_generator.dart';  // for title generator
@@ -21,7 +22,7 @@ class ChatController extends ChangeNotifier {
 
   // internal state for response text & conversation messages
   String _responseText = '';  // stores generated response text
-  final List<String> _messages = [];  // list of messages in the conversation
+  final List<Message> _messages = [];  // list of messages in the conversation
   Conversation? _currentConversation;  // current active conversation
   bool isConversationActive = false;  // track if a conversation is active
 
@@ -37,7 +38,7 @@ class ChatController extends ChangeNotifier {
   String get responseText => _responseText;  // returns the response text
 
   // public getter for messages
-  List<String> get messages => _messages;  // returns the list of messages
+  List<Message> get messages => _messages;  // returns the list of messages
 
   // public getter for the current conversation
   Conversation? get currentConversation => _currentConversation;  // returns current conversation
@@ -47,17 +48,17 @@ class ChatController extends ChangeNotifier {
     // Get the input text from the controller
     String inputText = inputController.text;  // user input text
 
-    // add the input text to the messages list
-    _messages.add(inputText);  // add input text to messages
+    // add the input text as a user message
+    _messages.add(Message(text: inputText, isUser: true));  // add input text as a user message
 
     // generate a response from the response generation service
     _responseText = await _responseGenerationService.generateResponse(inputText);  // generate response
 
-    // add the generated response to the messages list
-    _messages.add(_responseText);  // add response text to messages
+    // add the generated response as an AI message
+    _messages.add(Message(text: _responseText, isUser: false));  // add response text as AI message
 
     // auto-generate the title from all messages as a summary
-    String title = generateTitleFromMessages(_messages);  // generate title from messages
+    String title = generateTitleFromMessages(_messages.map((m) => m.text).toList());  // generate title from messages
 
     if (context.mounted) {
       // fetch user email from 'GoogleSignInProvider'
@@ -71,7 +72,7 @@ class ChatController extends ChangeNotifier {
         _currentConversation = Conversation(
           id: DateTime.now().millisecondsSinceEpoch.toString(),  // unique conversation id
           title: title,  // auto-generated title
-          messages: _messages,  // add messages to conversation
+          messages: _messages.map((m) => m.text).toList(),  // add messages to conversation
           createdAt: DateTime.now(),  // set creation time
           lastModified: DateTime.now(),  // initialize last modified time
         );
@@ -83,7 +84,7 @@ class ChatController extends ChangeNotifier {
 
           id: _currentConversation!.id,  // retain existing conversation id
           title: title,  // update title
-          messages: _messages,  // update messages
+          messages: _messages.map((m) => m.text).toList(),  // update messages
           createdAt: _currentConversation!.createdAt,  // retain existing creation time
           lastModified: DateTime.now(),  // update last modified time
         );
@@ -108,7 +109,11 @@ class ChatController extends ChangeNotifier {
 
     _currentConversation = conversation;  // set current conversation
     _messages.clear();  // clear existing messages
-    _messages.addAll(conversation.messages);  // add messages from the conversation
+    _messages.addAll(conversation.messages.map((text) {
+      // debug to check message state
+      print('Loading message: $text');
+      return Message(text: text, isUser: false);
+    }));  // add messages from the conversation
     isConversationActive = true;  // set active when a conversation is initialized
     notifyListeners();  // notify listeners of state changes
 

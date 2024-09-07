@@ -74,7 +74,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
 
         if (constraints.maxWidth > 900) {
           // if screen width is greater than 900 pixels, consider it a desktop screen
-          inputWidth = constraints.maxWidth * 0.60;
+          inputWidth = constraints.maxWidth * 0.40;
         } else if (constraints.maxWidth > 600) {
           // if screen width is greater than 600 pixels, consider it a tablet screen
           inputWidth = constraints.maxWidth * 0.70;

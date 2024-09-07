@@ -28,6 +28,10 @@ const Color AI_RESPONSE_COLOR = Colors.black;
 const Color AI_TEXT_COLOR = Colors.white70;
 const Color USER_TEXT_COLOR = Colors.black;
 
+// color for user messages
+const Color USER_MESSAGE_COLOR = Color(0xFFf1f1f1); // light-grey color for user messages
+
+
 // Font style
 const String COURIER_FONT_FAMILY = 'Courier';
 
