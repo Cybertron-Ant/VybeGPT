@@ -542,6 +542,135 @@ gemini-1.5-flash
  ```
 
 
+
+ ## Deploy flutter website to github:
+
+ - go to the root of your project directory:
+```python 
+cd ./towers
+  ```
+
+ - clean all files in 'build' directory:
+```python 
+flutter clean
+  ```
+
+ - get flutter dependencies:
+```python 
+flutter pub get
+  ```
+
+  - in this case, "flutter-website" is the name of your github repository, build flutter for web:
+```python 
+flutter build web --base-href /flutter-website/ --release
+  ```
+
+ - navigate to the 'web' directory in the 'build' folder:
+```python 
+cd ./build/web
+  ```
+
+
+- initialize git repository:
+```python 
+git init
+  ```
+
+
+- add/stage all files to git
+```python 
+git add .
+  ```
+
+
+- commit the added files with a message(or put "deployed v2" if this is the 2nd time going through the steps):
+```python 
+git commit -m "flutter website deployed v1"
+  ```
+
+
+- switch to the 'main' branch of your git repository:
+```python 
+git branch -M main
+  ```
+
+
+- switch back to the 'master' branch of your git repository:
+```python 
+git branch -M master
+  ```
+
+
+- add a github remote:
+```python 
+git remote add origin https://github.com/Cybertron-Ant/flutter-website.git
+  ```
+
+
+- push files to the 'master' branch on github:
+```python 
+git push -u origin master
+  ```
+
+
+- (alternatively) push to github and overwrite existing files in the previous commit:
+```python 
+git push -u --force origin master
+  ```
+
+
+### deploy flutter website to github pages:
+- click 'Settings' tab on the top
+- click 'Pages' menu tab on the left
+- deploy the 'master' branch and click 'Save'
+
+
+### Run Makefile script(at the root of your project) to deploy website to github pages:
+```python 
+make deploy-web
+  ```
+
+
+### generate SSH key to push to github from terminal:
+
+- Run this command to see if you already have an SSH key:
+```python 
+ls -al ~/.ssh
+  ```
+
+- Run this command to generate a new SSH key with your email:
+- When prompted, press Enter to accept the default location for the key (/home/your_username/.ssh/id_ed25519):
+- Choose a passphrase or leave it empty:
+```python 
+ssh-keygen -t ed25519 -C "mediainformationofficer@gmail.com"
+  ```
+
+
+### Add the SSH key to the SSH agent:
+- Start the SSH agent:
+```python 
+eval "$(ssh-agent -s)"
+  ```
+
+- Add your SSH private key to the SSH agent:
+```python 
+ssh-add ~/.ssh/id_ed25519
+  ```
+
+
+### Copy your SSH key to the clipboard:
+- Use this command to copy your SSH public key:
+```python 
+cat ~/.ssh/id_ed25519.pub
+  ```
+
+### Test the SSH connection to GitHub:
+- Run the following command to verify your SSH connection(Now, you can push your code to GitHub using SSH - git push origin master or your deployment command):
+```python 
+ssh -T git@github.com
+  ```
+
+
 com.kaibacorp.streetvybezgpt:
 > Task :app:signingReport
 Variant: debug
