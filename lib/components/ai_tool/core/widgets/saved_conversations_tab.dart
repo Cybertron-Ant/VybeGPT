@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/ai_tool/features/chat/controllers/chat_controller.dart';
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
 import 'package:towers/components/ai_tool/features/chat/presentation/chat_screen.dart';
@@ -146,7 +147,27 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
   @override
   Widget build(BuildContext context) {
 
-    return SafeArea( // ensure content is within safe area on smartphones
+    return Scaffold(
+
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text(''),
+
+        leading: IconButton(
+          iconSize: 30.0,
+          hoverColor: Colors.black,
+          tooltip: "New Chat",
+          icon: const Icon(Icons.edit_square),
+          onPressed: () {
+            final chatController = context.read<ChatController>();
+
+            // create a new conversation & navigate to it
+            chatController.createNewConversation(context);  // pass 'context' to 'createNewConversation'
+          },
+        ),
+      ),
+
+      body: SafeArea( // ensure content is within safe area on smartphones
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
 
@@ -245,7 +266,8 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
         ], // end 'children' widget array
 
       ),
-    );
+    ),
+   );
   } // end 'build' overridden method
 
 } // end of 'SavedConversationsTab' widget class

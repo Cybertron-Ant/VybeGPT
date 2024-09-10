@@ -124,19 +124,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   },  // end asynchronous 'onPressed()'
                 ),
 
-                IconButton(
-                  icon: const Icon(Icons.add),  // icon for the button
-
-                  onPressed: () {
-                    // access 'ChatController' using context.read()
-                    final chatController = context.read<ChatController>();
-
-                    // create a new conversation and navigate to it
-                    chatController.createNewConversation(context);  // Pass context to createNewConversation
-                  },
-
-                ),
-
               ],
 
             ),
