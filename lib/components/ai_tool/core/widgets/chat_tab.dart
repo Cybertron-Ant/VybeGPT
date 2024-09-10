@@ -54,7 +54,7 @@ class ChatTab extends StatelessWidget {
                           final isUserMessage = message.isUser;  // check if the message is from the user
 
                           // split the message into code and non-code parts
-                          final codeRegExp = RegExp(r'```(.*?)```', dotAll: true);
+                          final codeRegExp = RegExp(r'```(?:\w+)?\s*([\s\S]*?)\s*```');
                           final matches = codeRegExp.allMatches(message.text);
                           final nonCodeParts = <String>[];
                           final codeParts = <String>[];
@@ -65,7 +65,7 @@ class ChatTab extends StatelessWidget {
                             if (match.start > lastIndex) {
                               nonCodeParts.add(message.text.substring(lastIndex, match.start));
                             }
-                            codeParts.add(match.group(1)!);
+                            codeParts.add(match.group(1)!);  // extract code snippet without the language prefix
                             lastIndex = match.end;
                           } // end FOR
 
