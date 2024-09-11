@@ -11,6 +11,7 @@ import 'package:towers/components/ai_tool/features/chat/controllers/chat_control
 import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/login_system/screens/LoginPage.dart';
+import 'package:towers/components/ai_tool/features/options/widgets/user_avatar.dart';  // import the UserAvatar widget
 
 
 class ChatScreen extends StatefulWidget {  // main chat screen widget extending StatefulWidget
@@ -33,9 +34,16 @@ class _ChatScreenState extends State<ChatScreen> {
     final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
 
-    final currentUserEmail = emailSignInProvider.user?.email! ?? googleSignInProvider.userEmail ?? widget.userEmail;
+    // get & validate the user's email
+    String? emailFromProvider = emailSignInProvider.user?.email;
+    String? emailFromGoogle = googleSignInProvider.userEmail;
+    String currentUserEmail = emailFromProvider ?? emailFromGoogle ?? widget.userEmail;
 
-    if (currentUserEmail == null || currentUserEmail.isEmpty) {  // Check if userEmail is empty or null
+    debugPrint('Email from EmailSignInProvider: $emailFromProvider');
+    debugPrint('Email from GoogleSignInProvider: $emailFromGoogle');
+    debugPrint('Current User Email: $currentUserEmail');
+
+    if (currentUserEmail.isEmpty) {  // Check if userEmail is empty
       // navigate to 'LoginPage' if user's email is missing
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
@@ -99,31 +107,10 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
 
               actions: [ // actions to show buttons on the right side of the 'AppBar'
-                IconButton(
-                  icon: const Icon(Icons.logout),
-
-                  onPressed: () async {
-                    // access 'EmailSignInProvider' & call its 'signOut' method
-                    await emailSignInProvider.signOut(context);
-
-                    if (context.mounted) {
-                      // access 'GoogleSignInProvider' and call its 'signOut' method
-                      await googleSignInProvider.signOut(context);
-
-                      if (context.mounted) {
-                        // navigate back to 'LoginPage'
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
-                        );  // end 'Navigator' 'pushReplacement'
-                      }
-                    }
-
-                  },  // end asynchronous 'onPressed()'
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: UserAvatar(email: currentUserEmail), // pass email to 'UserAvatar' widget
                 ),
-
               ],
 
             ),
