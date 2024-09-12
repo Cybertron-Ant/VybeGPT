@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:towers/components/ai_tool/core/widgets/chat_tab.dart';
 import 'package:towers/components/ai_tool/core/widgets/saved_conversations_tab.dart';
+import 'package:towers/components/ai_tool/features/background_color/providers/background_color_provider.dart';
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';  // for conversation repository
 import 'package:towers/components/ai_tool/features/chat/data/gemini_repository.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
@@ -33,6 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // access 'EmailSignInProvider' or 'GoogleSignInProvider' to get user's email
     final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
     final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    final backgroundColorProvider = Provider.of<BackgroundColorProvider>(context, listen: true);
 
     // get & validate the user's email
     String? emailFromProvider = emailSignInProvider.user?.email;
@@ -85,6 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
           child: Scaffold(
             appBar: AppBar(
+              backgroundColor: backgroundColorProvider.backgroundColor,
               title: Text('Chat - $currentUserEmail'),  // AppBar with screen title
               automaticallyImplyLeading: false,  // remove the back navigation arrow
 

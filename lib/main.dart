@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/ai_tool/features/background_color/providers/background_color_provider.dart';
 import 'package:towers/components/email_sign_in/providers/email_sign_in_provider.dart';
 import 'package:towers/components/email_sign_in/providers/email_user_provider.dart';
 import 'package:towers/components/facebook_sign_in/providers/facebook_sign_in_provider.dart';
@@ -40,6 +41,8 @@ void main() async {
     runApp(
       MultiProvider(
         providers: [
+
+          ChangeNotifierProvider(create: (_) => BackgroundColorProvider()),
 
           // Provide 'LogOutProvider'
           ChangeNotifierProvider(create: (_) => LogOutProvider()),

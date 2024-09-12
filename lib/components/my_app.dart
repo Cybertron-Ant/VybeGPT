@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';  // for Flutter material design widgets
 import 'package:provider/provider.dart';  // for provider package
+import 'package:towers/components/ai_tool/features/background_color/providers/background_color_provider.dart';
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';  // for conversation repository
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for conversation service
 import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for response generation service
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
   // Override 'build' method to describe part of user interface represented by this widget
   @override
   Widget build(BuildContext context) {
+
+    final backgroundColorProvider = Provider.of<BackgroundColorProvider>(context).backgroundColor;
 
     return MultiProvider(
 
@@ -104,6 +107,7 @@ class MyApp extends StatelessWidget {
 
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: backgroundColorProvider, // use background color from provider
         ),
 
         home: const AuthenticationState(),

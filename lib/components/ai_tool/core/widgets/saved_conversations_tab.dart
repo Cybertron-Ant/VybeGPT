@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:towers/components/ai_tool/features/background_color/providers/background_color_provider.dart';
 import 'package:towers/components/ai_tool/features/chat/controllers/chat_controller.dart';
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
@@ -146,10 +147,12 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColorProvider = Provider.of<BackgroundColorProvider>(context, listen: true);
 
     return Scaffold(
 
       appBar: AppBar(
+        backgroundColor: backgroundColorProvider.backgroundColor,
         automaticallyImplyLeading: false,
         title: const Text(''),
 
