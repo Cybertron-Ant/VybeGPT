@@ -1,6 +1,6 @@
 # Makefile for building the towers project
-# Makefile describes how to compile and link the project to github page
-# Deploy Flutter web app to GitHub Pages
+# Makefile describes how to compile and link the project to github page & firebase hosting
+# Deploy Flutter web app to GitHub Pages & firebase hosting
 
 BASEHREF = '/flutter-website/'
 GITHUB_REPO = git@github.com:Cybertron-Ant/flutter-website.git
@@ -29,3 +29,25 @@ deploy-web:
 	@echo "🟢 Finished deploying. . ."
 
 .PHONY: deploy-web
+
+
+deploy-firebase-hosting:
+	@echo "Clean existing repository. . ."
+	flutter clean
+
+	@echo "Getting packages. . ."
+	flutter pub get
+
+	@echo "Building for the Web. . ."
+	flutter build web --release
+
+	@echo "initializing Firebase. . ."
+	firebase login
+	firebase init
+
+	@echo "Deploying Web app to Firebase. . ."
+	firebase deploy
+
+	@echo "🟢 Finished deploying Web app to Firebase. . ."
+
+.PHONY: deploy-firebase-hosting

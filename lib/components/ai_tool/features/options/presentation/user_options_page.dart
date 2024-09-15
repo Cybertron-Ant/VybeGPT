@@ -124,6 +124,14 @@ class _UserOptionsPageState extends State<UserOptionsPage> {
                         // sign out from email provider
                         await emailSignInProvider.signOut(context);
                         debugPrint(Constants.debugEmailSignOutSuccess);
+
+                        if (context.mounted) {// if context is still mounted, navigate to the login page
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LoginPage()),
+                            );
+                            debugPrint(Constants.debugNavigatingToLoginPage);
+                          }
                       } catch (e) {
                         debugPrint(Constants.debugEmailSignOutError);
                       }
@@ -133,19 +141,17 @@ class _UserOptionsPageState extends State<UserOptionsPage> {
                         try {
                           await googleSignInProvider.signOut(context);
                           debugPrint(Constants.debugGoogleSignOutSuccess);
+                       
+                          if (context.mounted) {// if context is still mounted, navigate to the login page
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LoginPage()),
+                            );
+                            debugPrint(Constants.debugNavigatingToLoginPage);
+                          }
+                        
                         } catch (e) {
                           debugPrint(Constants.debugGoogleSignOutError);
-                        }
-
-                        // if context is still mounted, navigate to the login page
-                        if (context.mounted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
-                            ),
-                          );
-                          debugPrint(Constants.debugNavigatingToLoginPage);
                         }
                       }
                     },

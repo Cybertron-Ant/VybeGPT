@@ -10,10 +10,14 @@ import 'package:towers/components/login_system/screens/LoginPage.dart';
 // responsible for dynamically switching between different pages
 /// (LoginPage & ChatScreen) based on the user's authentication state.
 /// it uses Firebase Authentication's stream to monitor changes in the authentication state.
-class AuthenticationState extends StatelessWidget {
+class AuthenticationState extends StatefulWidget {
   const AuthenticationState({super.key});
 
+  @override
+  State<AuthenticationState> createState() => _AuthenticationStateState();
+}
 
+class _AuthenticationStateState extends State<AuthenticationState> {
   @override
   Widget build(BuildContext context) {
     // access the 'GoogleSignInProvider' & 'EmailSignInProvider' instances
@@ -41,14 +45,22 @@ class AuthenticationState extends StatelessWidget {
           // if there is a user logged in, check if it's via Google or Email
           final user = snapshot.data;
 
-          if (googleSignInProvider.isSignedIn() && googleSignInProvider.userEmail != null) {
-            // if user is signed in with Google, & email is non-null, navigate to 'ChatScreen'
-            return ChatScreen(userEmail: googleSignInProvider.userEmail!);
+          final isGoogleSignIn = googleSignInProvider.isSignedIn() && googleSignInProvider.userEmail != null;
+          final isEmailSignIn = emailSignInProvider.isSignedIn() && emailSignInProvider.user?.email != null;
 
-          } else if (emailSignInProvider.isSignedIn() && emailSignInProvider.user!.email != null) {
-            // if signed in with email, navigate to 'ChatScreen'
-            return ChatScreen(userEmail: emailSignInProvider.user!.email!);
-
+          // forcefully navigate to 'ChatScreen'
+          if (isGoogleSignIn || isEmailSignIn) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                    userEmail: isGoogleSignIn ? googleSignInProvider.userEmail! : emailSignInProvider.user!.email!,
+                  ),
+                ),
+              );
+            });
+            return const SizedBox.shrink(); // return an empty widget while navigating
           } else {
             // if user is signed in but not via Google or Email (or not signed in correctly)
             return const LoginPage();
@@ -57,12 +69,17 @@ class AuthenticationState extends StatelessWidget {
           // else if the 'snapshot' does not have data, it means the user is not logged in
 
           // user is not logged in, navigate to 'LoginPage'
-          return const LoginPage();
-
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
+          });
+          return const SizedBox.shrink();
         } // end ELSE
       }, // end 'builder'
 
     );
 
-  } // end 'build' overridden method
-} // end 'AuthenticationState'
+  } // end '_AuthenticationStateState' state object
+} // end 'AuthenticationState' widget class

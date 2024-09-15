@@ -76,39 +76,45 @@ class _LoginPageState extends State<LoginPage> {
 
                             children: <Widget>[
 
-                              TextFormField(
-                                controller: Provider.of<EmailSignInProvider>(context, listen: false).emailController, // email controller
+                              Consumer<EmailSignInProvider>(
+                                builder: (context, emailSignInProvider, child) {
+                                  return TextFormField(
+                                    controller: emailSignInProvider.emailController, // email controller
 
-                                decoration: InputDecoration(
-                                  hintText: Strings.emailHint, // hint text for email
-                                  prefixIcon: const Icon(Icons.email), // icon for email
-                                  filled: true, // fill the field
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30), // border radius
-                                  ),
-                                ),
+                                    decoration: InputDecoration(
+                                      hintText: Strings.emailHint, // hint text for email
+                                      prefixIcon: const Icon(Icons.email), // icon for email
+                                      filled: true, // fill the field
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(30), // border radius
+                                      ),
+                                    ),
 
-                                validator: FormValidator.validateEmail, // email validation
-
+                                    validator: FormValidator.validateEmail, // email validation
+                                  );
+                                },
                               ),
 
                               const SizedBox(height: 10), // add space
 
-                              TextFormField(
-                                controller: Provider.of<EmailSignInProvider>(context, listen: false).passwordController, // password controller
+                              Consumer<EmailSignInProvider>(
+                                builder: (context, emailSignInProvider, child) {
+                                  return TextFormField(
+                                    controller: emailSignInProvider.passwordController, // password controller
 
-                                obscureText: true, // obscure password text
-                                decoration: InputDecoration(
-                                  hintText: Strings.passwordHint, // hint text for password
-                                  prefixIcon: const Icon(Icons.lock), // icon for password
-                                  filled: true, // fill the field
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30), // border radius
-                                  ),
-                                ),
+                                    obscureText: true, // obscure password text
+                                    decoration: InputDecoration(
+                                      hintText: Strings.passwordHint, // hint text for password
+                                      prefixIcon: const Icon(Icons.lock), // icon for password
+                                      filled: true, // fill the field
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(30), // border radius
+                                      ),
+                                    ),
 
-                                validator: FormValidator.validatePassword, // password validation
-
+                                    validator: FormValidator.validatePassword, // password validation
+                                  );
+                                },
                               ),
 
                               const SizedBox(height: 10), // add space
@@ -247,14 +253,32 @@ class _LoginPageState extends State<LoginPage> {
 
 
   Future<void> _login(BuildContext context) async {
-    final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
+  final emailSignInProvider = Provider.of<EmailSignInProvider>(context, listen: false);
 
+  try {
     await emailSignInProvider.signInWithEmail(
       context,
       emailSignInProvider.emailController.text,
       emailSignInProvider.passwordController.text,
     ); // perform login operation
 
-  } // end '_login' method
+    // navigate to 'ChatScreen' after successful login
+    if (context.mounted) {
+      Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(userEmail: emailSignInProvider.emailController.text),
+      ),
+    );
+    }
+  } catch (e) {
+    // handle errors
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Login failed: $e')),
+    );
+    }
+  } // end 'CATCH"
+} // end '_login' method
 
 } // end 'LoginPage' widget class
