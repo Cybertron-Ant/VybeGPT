@@ -670,6 +670,105 @@ cat ~/.ssh/id_ed25519.pub
 ssh -T git@github.com
   ```
 
+<br>
+
+# OAuth Configuration for Firebase and Google Cloud Console
+
+## Configuring Redirect URIs in Google Cloud Console
+
+To ensure proper OAuth flow, follow these steps to configure your redirect URIs:
+
+1. **Navigate to OAuth 2.0 Credentials:**
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
+   - Select your project and navigate to **APIs & Services** > **Credentials**.
+
+2. **Edit Authorized Redirect URIs:**
+   - Locate your OAuth 2.0 Client ID and click to edit.
+   - In the **Authorized redirect URIs** section, add the redirect URIs used by your application.
+
+   For Firebase-hosted applications, include the following URI:
+   ```
+   https://one-firebase-4266a.web.app/__/auth/handler
+   ```
+   - Ensure this URI is added exactly as shown. If you use other environments (e.g., localhost for development), remember to add those URIs as well.
+
+## Configuring JavaScript Origins
+
+To set up JavaScript origins for OAuth requests:
+
+1. **Edit Authorized JavaScript Origins:**
+   - In the same OAuth 2.0 Client ID settings, go to **Authorized JavaScript origins**.
+   - Add your Firebase app’s origin:
+   ```
+   https://one-firebase-4266a.web.app
+   ```
+
+## Firebase Configuration for OAuth
+
+Ensure your Firebase project is correctly set up to handle OAuth authentication:
+
+1. **Project Setup:**
+   - Open the [Firebase Console](https://console.firebase.google.com/).
+   - Select your project and navigate to **Build** > **Authentication** > **Sign-in method**.
+
+2. **Authorized Domains:**
+   - Ensure your domain (`one-firebase-4266a.web.app`) is listed under **Authorized Domains**. Firebase should automatically include it if you are using Firebase Hosting, but it’s good practice to verify.
+   
+   - build -> Authentication -> Settings -> Click on the Authorized domains tab.
+
+3. **Redirect URIs in Firebase Authentication:**
+   - Firebase Authentication typically handles redirect URIs automatically. For web apps, the standard redirect URI format used by Firebase is:
+   ```
+   https://your-app-id.firebaseapp.com/__/auth/handler
+   ```
+
+## Summary
+
+1. **Google Cloud Console:**
+   - Configure **Authorized Redirect URIs** and **Authorized JavaScript Origins** to match your Firebase app settings.
+
+2. **Firebase Console:**
+   - Verify that your domain is authorized and ensure redirect URIs are handled correctly by Firebase.
+
+
+# Authorized Domains and Configuration for Firebase Authentication
+
+## Domains Listed in Firebase Authentication
+
+1. **localhost**:
+   - This is automatically included for local development. It allows authentication requests from your local environment.
+
+2. **one-firebase-4266a.firebaseapp.com**:
+   - This is the default Firebase Hosting domain for your project. It’s used for accessing your app and handling authentication requests.
+
+3. **one-firebase-4266a.web.app**:
+   - This is another default Firebase Hosting domain often used for your production environment.
+
+## What You Need to Check
+
+### 1. Ensure Consistency with Google Cloud Console
+
+- Go to the [Google Cloud Console](https://console.cloud.google.com/).
+- In the OAuth 2.0 Client ID settings, make sure the **Authorized JavaScript origins** include:
+  - `https://one-firebase-4266a.firebaseapp.com`
+  - `https://one-firebase-4266a.web.app`
+- These origins should match the domains listed in Firebase. This allows your OAuth requests to come from these domains without issues.
+
+### 2. Authorized Redirect URIs in Google Cloud Console
+
+- In the **Authorized redirect URIs** section of your OAuth 2.0 Client ID settings in the Google Cloud Console, ensure you have added the following redirect URI:
+  ```
+  https://one-firebase-4266a.web.app/__/auth/handler
+  ```
+- This redirect URI is used by Firebase Authentication to handle OAuth flows.
+
+### 3. Testing and Verification
+
+- After setting up these configurations, test the authentication flow to ensure users can sign in and sign out without issues. Confirm that the redirection after sign-in correctly takes users to your application.
+
+By following these steps, you will ensure a smooth google OAuth authentication flow for your Firebase-hosted application.
+
+
 
 com.kaibacorp.streetvybezgpt:
 > Task :app:signingReport
