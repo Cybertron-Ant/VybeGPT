@@ -13,13 +13,8 @@ class ConversationService extends ChangeNotifier {  // service for managing conv
   // method to get a stream of conversations for a given user
   Stream<List<Conversation>> getConversationsStream(String userEmail) {
 
-    return _repository.getConversationsStream(userEmail)  // get the stream from the repository
-    // map snapshot to list of conversations
-        .map((snapshot) => snapshot.docs
-    // create Conversation objects from document data
-        .map((doc) => Conversation.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-    // convert to list
-        .toList());
+    // the repository already returns a stream of List<Conversation>, no need to map docs.
+    return _repository.getConversationsStream(userEmail);
 
   }  // end of 'getConversationsStream' method
 

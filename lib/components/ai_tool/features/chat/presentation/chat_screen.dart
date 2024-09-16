@@ -28,6 +28,18 @@ class ChatScreen extends StatefulWidget {  // main chat screen widget extending 
 
 class _ChatScreenState extends State<ChatScreen> {
   bool isDrawerOpen = true;  // Track the visibility of the SavedConversationsTab
+  late Future<List<Conversation>> _conversationsFuture;  // Future to load conversations
+
+  @override
+  void initState() {
+    super.initState();
+    _conversationsFuture = _loadConversations();  // initialize the future to load conversations
+  }
+
+  Future<List<Conversation>> _loadConversations() async {
+    final conversationRepository = Provider.of<ConversationRepository>(context, listen: false);
+    return await conversationRepository.loadConversations(widget.userEmail);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +132,24 @@ class _ChatScreenState extends State<ChatScreen> {
 
             drawer: !isLargeScreen
                 ? Drawer(
-              child: SavedConversationsTab(userEmail: currentUserEmail), // add 'SavedConversationsTab' as drawer content
+              child: FutureBuilder<List<Conversation>>(
+                future: _conversationsFuture,  // pass the future to 'FutureBuilder'
+                
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());  // show loading indicator while data is being fetched
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));  // show error if occurred
+                  } else if (snapshot.hasData) {
+                    return SavedConversationsTab(
+                      userEmail: currentUserEmail,
+                      conversations: snapshot.data!,  // provide the loaded conversations
+                    );
+                  } else {
+                    return const Center(child: Text('No conversations found'));  // show message if no data
+                  }
+                },
+              ),
             )
                 : null,  // conditionally show the drawer on smaller screens
 
@@ -131,7 +160,24 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (isLargeScreen && isDrawerOpen)
                   SizedBox(
                     width: 250,  // set the width for the drawer content on large screens
-                    child: SavedConversationsTab(userEmail: currentUserEmail), // add 'SavedConversationsTab' inline for large screens
+                    child: FutureBuilder<List<Conversation>>(
+                      future: _conversationsFuture,  // pass the future to 'FutureBuilder'
+                      
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());  // show loading indicator while data is being fetched
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));  // show error if occurred
+                        } else if (snapshot.hasData) {
+                          return SavedConversationsTab(
+                            userEmail: currentUserEmail,
+                            conversations: snapshot.data!,  // provide the loaded conversations
+                          );
+                        } else {
+                          return const Center(child: Text('No conversations found'));  // show message if no data
+                        }
+                      },
+                    ),
                   ),
 
                 Expanded(

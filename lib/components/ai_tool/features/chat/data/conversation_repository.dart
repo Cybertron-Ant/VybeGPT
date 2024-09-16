@@ -7,17 +7,34 @@ import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart
 class ConversationRepository extends ChangeNotifier {  // repository class for managing conversations
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;  // instance of Firestore
+  late Stream<List<Conversation>> _conversationsStream;
 
-  // method to get all conversations for a user
-  // this returns a stream of snapshots from the conversations collection
-  Stream<QuerySnapshot<Map<String, dynamic>>> getConversationsStream(String userEmail) {
-    return _firestore
+  // constructor to initialize the repository
+  ConversationRepository();
+
+  // method to get the conversations stream for a specific user
+  Stream<List<Conversation>> getConversationsStream(String userEmail) {
+    _conversationsStream = _firestore
         .collection('users')  // Firestore collection for users
         .doc(userEmail)  // document for specific user
         .collection('conversations')  // subcollection for conversations
         .orderBy('lastModified', descending: true)  // order conversations by 'lastModified' in descending order
-        .snapshots();  // get conversation collection stream for user
+        .snapshots()  // get conversation collection stream for user
+        .handleError((error) {
+          if (kDebugMode) {
+            print('Error fetching conversations stream: $error');
+          }
+        })
+        .map((snapshot) {
+          return snapshot.docs.map((doc) => Conversation.fromDocument(doc)).toList();
+        });
 
+    // listen to the stream and notify listeners on changes
+    _conversationsStream.listen((_) {
+      notifyListeners();  // notify listeners about the change
+    });
+
+    return _conversationsStream;  // return the stream
   }  // end of 'getConversationsStream' method
 
   // method to get a specific conversation by id for a user
@@ -28,8 +45,12 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
         .doc(userEmail)  // document for specific user
         .collection('conversations')  // subcollection for conversations
         .doc(conversationId)  // document for specific conversation
-        .get();  // get document by id for user
-
+        .get() // get document by id for user
+        .catchError((error) {
+          if (kDebugMode) {
+            print('Error fetching conversation: $error');
+          }
+        });
   }  // end of 'getConversation' method
 
   // method to create or update a conversation for a user
@@ -63,8 +84,10 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
           ..putIfAbsent('lastModified', () => DateTime.now())  // ensure 'lastModified' is updated
           ..putIfAbsent('createdAt', () => DateTime.now()),  // ensure 'createdAt' is set if not already present
         SetOptions(merge: true),  // merge with existing document
-
+      
       );  // save conversation for user
+
+      notifyListeners();  // notify listeners about the change
 
     } catch (e) {
 
@@ -110,6 +133,8 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
           'lastModified': DateTime.now(),  // ensure 'lastModified' is updated
         },
       );  // update conversation title for user
+
+      notifyListeners();  // notify listeners about the change
 
     } catch (e) {
 
@@ -187,6 +212,9 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
           .collection('conversations')
           .doc(conversationId)
           .delete();
+
+      notifyListeners();  // notify listeners about the change
+
     } catch (e) {
       if (kDebugMode) {
         print('Error deleting conversation: $e');

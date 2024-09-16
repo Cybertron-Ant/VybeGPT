@@ -10,8 +10,13 @@ import 'package:towers/components/ai_tool/core/widgets/edit_conversation_dialog.
 
 class SavedConversationsTab extends StatefulWidget {
   final String userEmail;  // Add userEmail as a parameter
+  final List<Conversation> conversations; // accept conversations as a parameter
 
-  const SavedConversationsTab({super.key, required this.userEmail});  // constructor with required userEmail
+  const SavedConversationsTab({
+    super.key,
+    required this.userEmail,
+    required this.conversations, // constructor with required userEmail and conversations
+  });
 
   @override
   _SavedConversationsTabState createState() => _SavedConversationsTabState();
@@ -42,8 +47,13 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
         }
       });
     _searchController.addListener(_filterConversations); // add listener for search input
-    _loadInitialConversations();
-  }
+  
+   if (context.mounted) {
+      _loadInitialConversations(); // load initial conversations when the widget is mounted
+    }
+    _conversations = widget.conversations; // initialize conversations from the passed argument
+    _filteredConversations = _conversations; // initialize filtered conversations
+  } // end 'initState' method
 
   Future<void> _loadInitialConversations() async {
     if (_isLoading) return;  // return if already loading
@@ -150,12 +160,12 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
     final backgroundColorProvider = Provider.of<BackgroundColorProvider>(context, listen: true);
 
     return Scaffold(
-
+     
       appBar: AppBar(
         backgroundColor: backgroundColorProvider.backgroundColor,
         automaticallyImplyLeading: false,
         title: const Text(''),
-
+       
         leading: IconButton(
           iconSize: 30.0,
           hoverColor: Colors.black,
@@ -169,108 +179,111 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
           },
         ),
       ),
-
+      
       body: SafeArea( // ensure content is within safe area on smartphones
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-
-        children: [
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 600, // adjust max width for larger screens
-              ),
-
-              child: TextField(
-                controller: _searchController,
-
-                decoration: InputDecoration(
-                  labelText: 'Search Conversations',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: _clearSearch,
-                  )
-                      : const Icon(Icons.search),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+        
+          children: [
+            
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 600, // adjust max width for larger screens
+                ),
+              
+                child: TextField(
+                  controller: _searchController,
+             
+                  decoration: InputDecoration(
+                    labelText: 'Search Conversations',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: _clearSearch,
+                          )
+                        : const Icon(Icons.search),
+                  ),
                 ),
               ),
             ),
-          ),
+           
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: _filteredConversations.length + 1,  // number of items in the list + 1 for the loading indicator
+                itemBuilder: (context, index) {
+                  
+                  if (index == _filteredConversations.length) {
+                    // show a loading indicator at the end of the list
+                    return _isLoading
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        : const SizedBox.shrink();  // empty widget when not loading
+                  } // end IF
 
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: _filteredConversations.length + 1,  // number of items in the list + 1 for the loading indicator
-              itemBuilder: (context, index) {
+                  final conversation = _filteredConversations[index];  // get conversation at index
 
-                if (index == _filteredConversations.length) {
-                  // show a loading indicator at the end of the list
-                  return _isLoading
-                      ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                      : const SizedBox.shrink();  // empty widget when not loading
-                } // end IF
-
-                final conversation = _filteredConversations[index];  // get conversation at index
-
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(2.0, 2.5, 2.0, 2.5,),
-
-                  child: ListTile(
-
-                    title: Text(
-                      // display only the first 50 characters & add an ellipsis if needed
-                      conversation.title.length > 50
-                          ? '${conversation.title.substring(0, 50)}...'  // truncate & add ellipsis
-                          : conversation.title,  // full title
-                      overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
-                      maxLines: 1,  // limit text to one line
-                    ),
-
-                    subtitle: const Text(""),
-
-                    onTap: () {
-
-                      // navigate to 'ChatScreen' & pass the conversation data
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          // pass 'conversation' & 'userEmail' to 'ChatScreen'
-                          builder: (context) => ChatScreen(
-                            conversation: conversation,
-                            userEmail: widget.userEmail,
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(2.0, 2.5, 2.0, 2.5,),
+                    
+                    child: ListTile(
+                      
+                      title: Text(
+                        // display only the first 50 characters & add an ellipsis if needed
+                        conversation.title.length > 50
+                            ? '${conversation.title.substring(0, 50)}...'  // truncate & add ellipsis
+                            : conversation.title,  // full title
+                        overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
+                        maxLines: 1,  // limit text to one line
+                      ),
+                     
+                      subtitle: const Text(""),
+                      
+                      onTap: () {
+                        
+                        // navigate to 'ChatScreen' & pass the conversation data
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            // pass 'conversation' & 'userEmail' to 'ChatScreen'
+                            builder: (context) => ChatScreen(
+                              conversation: conversation,
+                              userEmail: widget.userEmail,
+                            ),
                           ),
-                        ),
-                      ).then((_) => _refreshConversations()); // Refresh the list after returning from ChatScreen
-                    }, // end 'onTap'
+                        ).then((_) => _refreshConversations()); // Refresh the list after returning from ChatScreen
+                      }, // end 'onTap'
 
-                    onLongPress: () {
-                      // show a dialog to edit the title using the extracted logic
-                      showEditConversationDialog(
-                        context: context,
-                        userEmail: widget.userEmail,
-                        conversationId: conversation.id,
-                        initialTitle: conversation.title,
-
-                      ).then((_) => _refreshConversations()); // Refresh the list after editing or deleting
-                    }, // end 'onLongPress'
-
-                  ),
-                );
-              }, // end 'builder' method
+                      onLongPress: () {
+                        // show a dialog to edit the title using the extracted logic
+                        showEditConversationDialog(
+                          context: context,
+                          userEmail: widget.userEmail,
+                          conversationId: conversation.id,
+                          initialTitle: conversation.title,
+                        
+                        ).then((_) {
+                          // refresh conversations list after editing
+                          _refreshConversations();
+                        });
+                      }, // end 'onLongPress'
+                   
+                    ),
+                  );
+                }, // end 'itemBuilder'
+              ),
             ),
-          ),
 
-        ], // end 'children' widget array
+          ], // end 'children' widget array
 
+        ),
       ),
-    ),
-   );
+    );
   } // end 'build' overridden method
 
-} // end of 'SavedConversationsTab' widget class
+} // end '_SavedConversationsTabState' state class
