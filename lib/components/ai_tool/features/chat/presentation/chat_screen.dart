@@ -13,6 +13,7 @@ import 'package:towers/components/email_sign_in/providers/email_sign_in_provider
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/login_system/screens/LoginPage.dart';
 import 'package:towers/components/ai_tool/features/options/widgets/user_avatar.dart';  // import the UserAvatar widget
+import 'package:towers/components/ai_tool/features/loading_animations/shimmer_loading_indicator.dart';  // import shimmer loading indicator
 
 
 class ChatScreen extends StatefulWidget {  // main chat screen widget extending StatefulWidget
@@ -105,21 +106,21 @@ class _ChatScreenState extends State<ChatScreen> {
 
               leading: isLargeScreen  // show the toggle button on large screens
                   ? IconButton(
-                icon: Icon(isDrawerOpen ? Icons.arrow_back_ios_rounded : Icons.ad_units_sharp),
-                onPressed: () {
-                  setState(() {
-                    isDrawerOpen = !isDrawerOpen;  // toggle drawer visibility
-                  });
-                },
-              )
+                      icon: Icon(isDrawerOpen ? Icons.arrow_back_ios_rounded : Icons.ad_units_sharp),
+                      onPressed: () {
+                        setState(() {
+                          isDrawerOpen = !isDrawerOpen;  // toggle drawer visibility
+                        });
+                      },
+                    )
                   : Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu), // icon for the drawer
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer(); // open the drawer
-                  },
-                ),
-              ),
+                      builder: (context) => IconButton(
+                        icon: const Icon(Icons.menu), // icon for the drawer
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer(); // open the drawer
+                        },
+                      ),
+                    ),
 
               actions: [ // actions to show buttons on the right side of the 'AppBar'
                 Padding(
@@ -132,25 +133,25 @@ class _ChatScreenState extends State<ChatScreen> {
 
             drawer: !isLargeScreen
                 ? Drawer(
-              child: FutureBuilder<List<Conversation>>(
-                future: _conversationsFuture,  // pass the future to 'FutureBuilder'
-                
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());  // show loading indicator while data is being fetched
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));  // show error if occurred
-                  } else if (snapshot.hasData) {
-                    return SavedConversationsTab(
-                      userEmail: currentUserEmail,
-                      conversations: snapshot.data!,  // provide the loaded conversations
-                    );
-                  } else {
-                    return const Center(child: Text('No conversations found'));  // show message if no data
-                  }
-                },
-              ),
-            )
+                    child: FutureBuilder<List<Conversation>>(
+                      future: _conversationsFuture,  // pass the future to 'FutureBuilder'
+                      
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const ShimmerLoadingIndicator();  // use shimmer loading indicator
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));  // show error if occurred
+                        } else if (snapshot.hasData) {
+                          return SavedConversationsTab(
+                            userEmail: currentUserEmail,
+                            conversations: snapshot.data!,  // provide the loaded conversations
+                          );
+                        } else {
+                          return const Center(child: Text('No conversations found'));  // show message if no data
+                        }
+                      },
+                    ),
+                  )
                 : null,  // conditionally show the drawer on smaller screens
 
             body: Row(  // use Row to layout the content side by side on large screens
@@ -165,7 +166,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());  // show loading indicator while data is being fetched
+                          return const ShimmerLoadingIndicator();  // use shimmer loading indicator
                         } else if (snapshot.hasError) {
                           return Center(child: Text('Error: ${snapshot.error}'));  // show error if occurred
                         } else if (snapshot.hasData) {
