@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class BackgroundColorProvider with ChangeNotifier {
   
   // define a default background color
-  final Color _defaultBackgroundColor = const Color.fromARGB(255, 255, 255, 255);
+  final Color _defaultBackgroundColor = const Color.fromARGB(255, 134, 134, 134);
 
   // reference the user-selected background color
   Color? _backgroundColor;
