@@ -14,7 +14,7 @@ import 'components/login_system/database_initialization/widgets/error_app.dart';
 import 'components/my_app.dart';
 import 'components/ai_tool/features/chat/domain/response_generation_service.dart';  // Ensure correct import path
 import 'components/ai_tool/features/chat/domain/conversation_service.dart';  // Ensure correct import path
-import 'components/ai_tool/features/chat/data/gemini_repository.dart';  // Ensure correct import path
+import 'components/ai_tool/features/chat/data/ai_repository.dart';  // Ensure correct import path
 import 'components/ai_tool/features/chat/data/conversation_repository.dart';  // Ensure correct import path
 import 'components/ai_tool/features/chat/controllers/chat_controller.dart';  // Ensure correct import path
 
@@ -72,7 +72,7 @@ void main() async {
 
           // provide 'ResponseGenerationService' as a regular provider
           Provider<ResponseGenerationService>(
-            create: (_) => ResponseGenerationService(GeminiRepository()),  // create ResponseGenerationService with GeminiRepository
+            create: (_) => ResponseGenerationService(AIRepository()),  // create ResponseGenerationService with GeminiRepository
           ),
 
           // provide 'ConversationService'

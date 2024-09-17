@@ -8,9 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // for Firestore database
 import 'package:flutter/services.dart'; // for loading assets
 
 
-// define a class named 'GeminiRepository'
-// this class is responsible for interacting with the gemini generative model
-class GeminiRepository {  // repository for handling gemini model interactions
+// this class is responsible for interacting with the ai generative model
+class AIRepository {  // repository for handling ai model interactions
 
   // declare a late final variable for the generative model
   // this will hold the instance of the generative model used for generating content
@@ -22,11 +21,11 @@ class GeminiRepository {  // repository for handling gemini model interactions
   // Firestore instance for fetching the API key and model version
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // constructor for the geminirepository class
+  // constructor for the airepository class
   // this initializes the generative model using the api key from Firestore
-  GeminiRepository() {  // constructor to initialize the generative model
+  AIRepository() {  // constructor to initialize the generative model
     _initialization = _initializeModel();  // start the initialization process
-  } // end of geminirepository constructor
+  } // end of airepository constructor
 
   // method to initialize the generative model
   // fetches the API key & model version from Firestore and sets up the generative model
@@ -109,4 +108,4 @@ class GeminiRepository {  // repository for handling gemini model interactions
     } catch (e) {// handle any errors that occur during the Firestore update
     }
   } // end of 'setAISettings' method
-} // end of 'GeminiRepository' class
+} // end of 'aiRepository' class

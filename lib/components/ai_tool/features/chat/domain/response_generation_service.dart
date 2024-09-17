@@ -1,11 +1,11 @@
-import 'package:towers/components/ai_tool/features/chat/data/gemini_repository.dart';
+import 'package:towers/components/ai_tool/features/chat/data/ai_repository.dart';
 
 
 class ResponseGenerationService {  // service class for generating responses
 
   // declare a final variable for the gemini repository
   // this repository instance will be used to interact with the gemini model
-  final GeminiRepository repository;  // repository instance for gemini model
+  final AIRepository repository;  // repository instance for gemini model
 
   // constructor for the 'ResponseGenerationService' class
   // it initializes the service with the given repository instance

@@ -4,7 +4,7 @@ import 'package:towers/components/ai_tool/core/widgets/chat_tab.dart';
 import 'package:towers/components/ai_tool/core/widgets/saved_conversations_tab.dart';
 import 'package:towers/components/ai_tool/features/background_color/providers/background_color_provider.dart';
 import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';  // for conversation repository
-import 'package:towers/components/ai_tool/features/chat/data/gemini_repository.dart';
+import 'package:towers/components/ai_tool/features/chat/data/ai_repository.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation.dart';
 import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';  // for conversation service
 import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';  // for response generation service
@@ -83,7 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
           create: (_) {
 
             final conversationService = ConversationService(ConversationRepository());  // Create 'ConversationService' instance
-            final geminiRepository = GeminiRepository();  // create 'GeminiRepository' instance
+            final geminiRepository = AIRepository();  // create 'GeminiRepository' instance
             final responseGenerationService = ResponseGenerationService(geminiRepository);  // Create 'ResponseGenerationService' instance
 
             final chatController = ChatController(
