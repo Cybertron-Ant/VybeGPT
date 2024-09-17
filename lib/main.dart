@@ -12,22 +12,22 @@ import 'package:towers/components/login_system/user_authentication/log_out/provi
 import 'components/login_system/database_initialization/firebase_init.dart';
 import 'components/login_system/database_initialization/widgets/error_app.dart';
 import 'components/my_app.dart';
-import 'components/ai_tool/features/chat/domain/response_generation_service.dart';  // Ensure correct import path
-import 'components/ai_tool/features/chat/domain/conversation_service.dart';  // Ensure correct import path
-import 'components/ai_tool/features/chat/data/ai_repository.dart';  // Ensure correct import path
-import 'components/ai_tool/features/chat/data/conversation_repository.dart';  // Ensure correct import path
-import 'components/ai_tool/features/chat/controllers/chat_controller.dart';  // Ensure correct import path
+import 'components/ai_tool/features/chat/domain/response_generation_service.dart'; // Ensure correct import path
+import 'components/ai_tool/features/chat/domain/conversation_service.dart'; // Ensure correct import path
+import 'components/ai_tool/features/chat/data/ai_repository.dart'; // Ensure correct import path
+import 'components/ai_tool/features/chat/data/conversation_repository.dart'; // Ensure correct import path
+import 'components/ai_tool/features/chat/controllers/chat_controller.dart'; // Ensure correct import path
 
 // 'MaterialApp' widget as the root
 // the 'Firebase' initialization should be completed before running the app
 void main() async {
-
+  
   // ensure Flutter binding is initialized before any asynchronous code
   WidgetsFlutterBinding.ensureInitialized(); // ensure binding before Firebase initialization
 
   // try to initialize 'Firebase' with the default options for the current platform
   try {
-
+    
     // wait for Firebase to be initialized before executing other code
     // initialize Firebase using the FirebaseInitializer class
     await FirebaseInitializer.initializeFirebase();
@@ -41,7 +41,7 @@ void main() async {
     runApp(
       MultiProvider(
         providers: [
-
+          
           ChangeNotifierProvider(create: (_) => BackgroundColorProvider()),
 
           // Provide 'LogOutProvider'
@@ -72,7 +72,7 @@ void main() async {
 
           // provide 'ResponseGenerationService' as a regular provider
           Provider<ResponseGenerationService>(
-            create: (_) => ResponseGenerationService(AIRepository()),  // create ResponseGenerationService with GeminiRepository
+            create: (_) => ResponseGenerationService(AIRepository()),  // create ResponseGenerationService with AIRepository
           ),
 
           // provide 'ConversationService'
@@ -88,7 +88,7 @@ void main() async {
               context.read<ResponseGenerationService>(),
               context.read<ConversationService>(),
             ),
-
+           
             update: (context, googleSignInProvider, responseGenerationService, chatController) {
               if (chatController == null) {
                 if (kDebugMode) {
@@ -109,9 +109,9 @@ void main() async {
         child: const MyApp(),
       ),
     );
-
+  
   } catch (e, stackTrace) {
-
+   
     // if Firebase initialization fails, print error and run the error app
     if (kDebugMode) {
       print("Error initializing Firebase: $e");
@@ -119,7 +119,7 @@ void main() async {
     }
 
     runApp(ErrorApp(errorMessage: e.toString()));
-
+  
   } // end 'CATCH'
 
 } // end 'main' asynchronous function

@@ -83,8 +83,8 @@ class _ChatScreenState extends State<ChatScreen> {
           create: (_) {
 
             final conversationService = ConversationService(ConversationRepository());  // Create 'ConversationService' instance
-            final geminiRepository = AIRepository();  // create 'GeminiRepository' instance
-            final responseGenerationService = ResponseGenerationService(geminiRepository);  // Create 'ResponseGenerationService' instance
+            final aiRepository = AIRepository();  // create 'aiRepository' instance
+            final responseGenerationService = ResponseGenerationService(aiRepository);  // Create 'ResponseGenerationService' instance
 
             final chatController = ChatController(
               responseGenerationService,  // pass 'ResponseGenerationService' instance
