@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';  // Import the lottie package for animations
 
 
-// utility function to build the send button with progress indicator or send icon
+// utility function to build the send button with fire animation or send icon
 Widget buildSendButton({
   required bool isTextEmpty,
   required bool isLoading,
@@ -22,13 +23,17 @@ Widget buildSendButton({
       ), // end of box decoration
 
       child: isLoading
-          ? const CircularProgressIndicator(
-              strokeWidth: 3.0,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ? Lottie.asset(
+              'assets/animations/fire_animation.json', 
+              width: 42, 
+              height: 50,
+              fit: BoxFit.fill,
+              repeat: true,
+              animate: true,
             )
-          : const Icon(Icons.send, color: Colors.white), // add a send icon or progress indicator to the button
+          : const Icon(Icons.send, color: Colors.white), // show the send icon when not loading
     ), // end of 'send' button container
-
+ 
   ); // end of gesture detector
 
 } // end 'buildSendButton' function
