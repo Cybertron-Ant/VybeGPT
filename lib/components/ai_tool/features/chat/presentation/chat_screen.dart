@@ -101,7 +101,26 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Scaffold(
             appBar: AppBar(
               backgroundColor: backgroundColorProvider.backgroundColor,
-              title: Text('Chat - $currentUserEmail'),  // AppBar with screen title
+              title: const Row(
+                mainAxisSize: MainAxisSize.min,  // prevent Row from expanding to fill the space
+                children: [
+                  Text(
+                    'StreetVybezGPT',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(135, 3, 3, 3),
+                    ),
+                  ),
+                 
+                  SizedBox(width: 8.0),  // space between text and image
+                
+                  CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/logo4.jpg'),
+                    radius: 20,
+                  ),
+                ],
+              ),  // AppBar with screen title
               automaticallyImplyLeading: false,  // remove the back navigation arrow
 
               leading: isLargeScreen  // show the toggle button on large screens
