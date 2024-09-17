@@ -1,4 +1,3 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1539588814.
 // import the google generative ai package
 // this package provides tools to interact with google's generative ai models
 import 'package:flutter/foundation.dart';
@@ -27,8 +26,6 @@ class GeminiRepository {  // repository for handling gemini model interactions
   // this initializes the generative model using the api key from Firestore
   GeminiRepository() {  // constructor to initialize the generative model
     _initialization = _initializeModel();  // start the initialization process
-
-    setAISettings("AIzaSyCt8-j9AnCObf5a6uCZAIwhUwWo5qjaJwI", "gemini-1.5-flash");
   } // end of geminirepository constructor
 
   // method to initialize the generative model
@@ -43,50 +40,21 @@ class GeminiRepository {  // repository for handling gemini model interactions
       if (documentSnapshot.exists) {
         final data = documentSnapshot.data();
 
-        // debug statement to check the data fetched from Firestore
-        if (kDebugMode) {
-          print('Fetched Firestore document data: $data');
-          print('Document exists: ${documentSnapshot.exists}');
-        }
-
         // check if the expected fields are present
         if (data != null) {
           final String? apiKey = data['API_KEY'];
           final String? modelVersion = data['MODEL_VERSION'];
-
-          // debug statements to verify API key and model version
-          if (kDebugMode) {
-            print('API Key: $apiKey');
-            print('Model Version: $modelVersion');
-          }
 
           if (apiKey != null && modelVersion != null) {
             // initialize the generative model with the fetched model version and API key
             _model = GenerativeModel(
                 model: modelVersion,
                 apiKey: apiKey); // Initialize the generative model
-          } else {
-            if (kDebugMode) {
-              print('API_KEY or MODEL_VERSION field is missing or null.');
-            }
-          }// end ELSE
-        } else {
-          if (kDebugMode) {
-            print('Document data is null.');
           }
-        }// end ELSE
-      } else {
-        // handle missing Firestore document
-        if (kDebugMode) {
-          print('Firestore document for AI settings not found.');
         }
+      } else {// handle missing Firestore document
       }//end ELSE
-    } catch (e) {
-      // handle any errors that occur during the initialization
-      if (kDebugMode) {
-        print('Error initializing model: $e');
-      
-      }  // log the error
+    } catch (e) {// handle any errors that occur during the initialization
     }
   } // end of '_initializeModel' method
 
@@ -97,8 +65,7 @@ class GeminiRepository {  // repository for handling gemini model interactions
     // ensure the model is initialized
     await _initialization;  // wait for initialization to complete
 
-    if (_model == null) {
-      // return an error message if the model is not initialized
+    if (_model == null) {// return an error message if the model is not initialized
       return 'AI model is not initialized.';
     }
 
@@ -114,11 +81,7 @@ class GeminiRepository {  // repository for handling gemini model interactions
       // extract the response text from the model's output
       // if the response is null, return a default message indicating no response
       return response.text ?? 'No response generated.';  // Return the generated response or default message
-    } catch (e) {
-      // handle any errors that occur during the request
-      if (kDebugMode) {
-        print('Error generating response: $e');
-      }  // log the error
+    } catch (e) {// handle any errors that occur during the request
       return 'Error generating response.';  // Return an error message
     }
   }  // end of generateResponse method
@@ -143,15 +106,7 @@ class GeminiRepository {  // repository for handling gemini model interactions
         'API_KEY': apiKey,
         'MODEL_VERSION': modelVersion,
       });
-
-      if (kDebugMode) {
-        print('AI settings updated successfully.');
-      }
-    } catch (e) {
-      // handle any errors that occur during the Firestore update
-      if (kDebugMode) {
-        print('Error updating AI settings in Firestore: $e');
-      } // log the error
+    } catch (e) {// handle any errors that occur during the Firestore update
     }
   } // end of 'setAISettings' method
 } // end of 'GeminiRepository' class
