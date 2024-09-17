@@ -5,50 +5,56 @@ import 'package:towers/components/ai_tool/features/chat/data/conversation_reposi
 
 // function to show a dialog for editing the conversation title
 Future<void> showEditConversationDialog({
-
+  
   required BuildContext context,
   required String userEmail,
   required String conversationId,
   required String initialTitle,
 
 }) async {
-
+  
   // create a text controller with the initial title
   final TextEditingController titleController = TextEditingController(text: initialTitle);
+
+  // Get the screen size
+  final Size screenSize = MediaQuery.of(context).size;
 
   // show a dialog with a text field for editing the title
   return showDialog(
     context: context,
     builder: (BuildContext context) {
-
+    
       return AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
         backgroundColor: Colors.black.withOpacity(0.8),
-
+      
         title: const Text(
           'Edit Conversation',
           style: TextStyle(color: Colors.white),
         ),
-
-        content: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,  // controller for the text field
-              decoration: const InputDecoration(
-                hintText: 'Enter new title',
-                hintStyle: TextStyle(color: Colors.grey),
-                border: OutlineInputBorder(),
+       
+        content: SizedBox(
+          width: screenSize.width < 600 ? double.maxFinite : 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,  // controller for the text field
+                decoration: const InputDecoration(
+                  hintText: 'Enter new title',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(),
+                ),
+                style: const TextStyle(color: Colors.white),
               ),
-              style: const TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
           
-          ],
+            ],
+          ),
         ),
-
+        
         actions: <Widget>[
          
           // button to cancel editing
@@ -62,19 +68,19 @@ Future<void> showEditConversationDialog({
               Navigator.of(context).pop();  // Close the dialog
             },
           ),
-
+          
           // button to save the edited title
           TextButton(
             style: TextButton.styleFrom(
               foregroundColor: Colors.green,
             ),
             child: const Text('Save'),
-           
+          
             onPressed: () async {
               final newTitle = titleController.text.trim();  // get the new title from the text field
 
               if (newTitle.isNotEmpty) {
-
+            
                 // update the 'title' in Firestore
                 await Provider.of<ConversationRepository>(context, listen: false)
                     .updateConversationTitle(userEmail, conversationId, newTitle);  // provide all 3 arguments
@@ -82,11 +88,11 @@ Future<void> showEditConversationDialog({
                 if (context.mounted) {
                   Navigator.of(context).pop();  // close the dialog
                 }
-
+            
               }
             },
           ),
-
+         
           // Delete button
           TextButton(
             style: TextButton.styleFrom(
