@@ -1,16 +1,12 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:1539588814.
 // import the google generative ai package
 // this package provides tools to interact with google's generative ai models
 import 'package:flutter/foundation.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';  // for generative AI interaction
-
-// import the api constants from the core components
-// this file contains constants related to api keys and other configurations
-import 'package:towers/components/ai_tool/core/constants/api_constants.dart';
-
+import 'package:google_generative_ai/google_generative_ai.dart'; // for generative AI interaction
+import 'package:cloud_firestore/cloud_firestore.dart'; // for Firestore database
 // this package provides functionality for asset loading & other services
 // this package is used to decode JSON data into Dart objects
-import 'package:flutter/services.dart';  // for loading assets
-import 'dart:convert';  // for JSON decoding
+import 'package:flutter/services.dart'; // for loading assets
 
 
 // define a class named 'GeminiRepository'
@@ -24,36 +20,72 @@ class GeminiRepository {  // repository for handling gemini model interactions
   // a Future that completes when the ai model is initialized
   late final Future<void> _initialization;  // Future to track model initialization
 
+  // Firestore instance for fetching the API key and model version
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   // constructor for the geminirepository class
-  // this initializes the generative model using the api key from the JSON configuration file
+  // this initializes the generative model using the api key from Firestore
   GeminiRepository() {  // constructor to initialize the generative model
     _initialization = _initializeModel();  // start the initialization process
-  }  // end of geminirepository constructor
+
+    setAISettings("AIzaSyCt8-j9AnCObf5a6uCZAIwhUwWo5qjaJwI", "gemini-1.5-flash");
+  } // end of geminirepository constructor
 
   // method to initialize the generative model
-  // this reads the configuration file & sets up the generative model
+  // fetches the API key & model version from Firestore and sets up the generative model
   Future<void> _initializeModel() async {  // method to initialize the generative model
 
     try {
+      // fetch the API key & model version from Firestore
+      final documentSnapshot =
+          await _firestore.collection('config').doc('aiSettings').get();
 
-      // load the configuration file from assets
-      // this reads the JSON file containing API key and other configurations
-      final configString = await rootBundle.loadString(configurationJSON);  // load configuration JSON
-      final config = jsonDecode(configString);  // decode JSON string into a map
+      if (documentSnapshot.exists) {
+        final data = documentSnapshot.data();
 
-      // get the API key from the JSON configuration
-      // this ensures that the correct API key is used for authentication
-      final apiKey = config['API_KEY'];  // get API key from JSON or constants
+        // debug statement to check the data fetched from Firestore
+        if (kDebugMode) {
+          print('Fetched Firestore document data: $data');
+          print('Document exists: ${documentSnapshot.exists}');
+        }
 
-      // initialize the generative model with the specified model version and API key
-      // this sets up the model for generating content based on input text
-      _model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);  // Initialize the generative model
+        // check if the expected fields are present
+        if (data != null) {
+          final String? apiKey = data['API_KEY'];
+          final String? modelVersion = data['MODEL_VERSION'];
 
+          // debug statements to verify API key and model version
+          if (kDebugMode) {
+            print('API Key: $apiKey');
+            print('Model Version: $modelVersion');
+          }
+
+          if (apiKey != null && modelVersion != null) {
+            // initialize the generative model with the fetched model version and API key
+            _model = GenerativeModel(
+                model: modelVersion,
+                apiKey: apiKey); // Initialize the generative model
+          } else {
+            if (kDebugMode) {
+              print('API_KEY or MODEL_VERSION field is missing or null.');
+            }
+          }// end ELSE
+        } else {
+          if (kDebugMode) {
+            print('Document data is null.');
+          }
+        }// end ELSE
+      } else {
+        // handle missing Firestore document
+        if (kDebugMode) {
+          print('Firestore document for AI settings not found.');
+        }
+      }//end ELSE
     } catch (e) {
       // handle any errors that occur during the initialization
       if (kDebugMode) {
         print('Error initializing model: $e');
-
+      
       }  // log the error
     }
   } // end of '_initializeModel' method
@@ -94,10 +126,32 @@ class GeminiRepository {  // repository for handling gemini model interactions
   // method to get the response stream from the model
   // this method should interact with the model to get a stream of responses
   Stream<String> getResponseStream() {
-
+    
     // implement this method to interact with the AI model and return a stream of responses
     throw UnimplementedError();  // placeholder for actual implementation
-
+  
   } // end 'getResponseStream' method
 
-} // end of 'geminirepository' class
+  // method to set the API key and model version in Firestore
+  // this method takes the API key and model version as parameters and saves them in Firestore
+  Future<void> setAISettings(String apiKey, String modelVersion) async {
+    // method to set the AI settings in Firestore
+
+    try {
+      // Update or set the API key and model version in Firestore
+      await _firestore.collection('config').doc('aiSettings').set({
+        'API_KEY': apiKey,
+        'MODEL_VERSION': modelVersion,
+      });
+
+      if (kDebugMode) {
+        print('AI settings updated successfully.');
+      }
+    } catch (e) {
+      // handle any errors that occur during the Firestore update
+      if (kDebugMode) {
+        print('Error updating AI settings in Firestore: $e');
+      } // log the error
+    }
+  } // end of 'setAISettings' method
+} // end of 'GeminiRepository' class
