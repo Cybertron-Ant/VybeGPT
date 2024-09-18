@@ -854,6 +854,41 @@ dart run flutter_launcher_icons:main
 ```
 
 
+## Flutter Native Splash
+
+This repository uses the `flutter_native_splash` package to add and configure splash screens for both Android and iOS platforms in a Flutter project.
+
+### Installation
+
+1. **Add the Package**
+
+   Add the `flutter_native_splash` package to your `pubspec.yaml` file by running the following command:
+
+   ```bash
+   dart pub add flutter_native_splash --dev
+   ```
+   
+## Add and Edit Configuration
+
+### Create and edit the flutter_native_splash.yaml file in the root directory of your project to define the splash screen configurations:
+
+# Example flutter_native_splash.yaml configuration:
+```bash
+flutter_native_splash:
+  image: assets/splash.png
+  color: "#ffffff"
+  android: true
+  ios: true
+```
+
+## Generate Splash Screen Files:
+
+### Run the following command to generate the necessary splash screen files and configurations for both Android and iOS:
+```bash
+dart run flutter_native_splash:create
+```
+
+
 com.kaibacorp.streetvybezgpt:
 > Task :app:signingReport
 Variant: debug

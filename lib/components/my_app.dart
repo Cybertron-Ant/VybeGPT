@@ -14,6 +14,7 @@ import 'package:towers/components/google_sign_in/providers/google_sign_in_provid
 import 'package:towers/components/google_sign_in/providers/google_user_provider.dart';  // for Google user provider
 import 'package:towers/components/login_system/constants/strings.dart';  // for application strings
 import 'package:towers/components/login_system/user_authentication/log_out/providers/log_out_provider.dart';  // for log out provider
+import 'package:towers/components/splash_screen/widgets/splash_screen.dart';
 import 'login_system/user_authentication/login_state/authentication_state.dart';  // for authentication state
 
 
@@ -110,7 +111,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: backgroundColorProvider, // use background color from provider
         ),
 
-        home: const AuthenticationState(),
+        home: const SplashScreen(),
 
       ),
     );
