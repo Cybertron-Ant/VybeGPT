@@ -769,6 +769,90 @@ Ensure your Firebase project is correctly set up to handle OAuth authentication:
 By following these steps, you will ensure a smooth google OAuth authentication flow for your Firebase-hosted application.
 
 
+## Changing App Icon and Package Name
+
+## How to Change App Icon and Package Name
+
+### App Icon
+
+To change the app icon, follow these steps:
+
+1. **Generate Icons**:
+   - Visit [Android Asset Studio](https://romannurik.github.io/AndroidAssetStudio/icons-launcher.html) to generate icons.
+
+2. **Add Dependency**:
+   ```bash
+   dart pub add flutter_launcher_icons --dev
+   ```
+
+Configure pubspec.yaml: Add the following to your pubspec.yaml file:
+flutter_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/logo.png"
+  web:
+    generate: true
+    image_path: "assets/logo.png"
+    background_color: "#0175C2"
+    theme_color: "#0175C2"
+
+Generate Icons:
+```bash
+dart pub run flutter_launcher_icons:main
+```
+
+## To change the package name:
+```bash
+   flutter pub add rename --dev
+   ```
+
+- Add All Unversioned iOS Image Files: Ensure all iOS images are added to version control.
+
+## Change Package Name:
+```bash
+dart run rename setBundleId --targets android --value "com.kaibacorp.test_package_name"
+```
+
+```bash
+dart run rename setBundleId --targets ios --value "com.kaibacorp.test_package_name"
+```
+
+### Get Current Package Name:
+```bash
+dart run rename getBundleId --targets android
+```
+
+```bash
+dart run rename getBundleId --targets ios
+```
+
+
+### Rename App Name:
+```bash
+rename getAppName --targets ios
+```
+
+### To output the current AppName for multiple targets:
+```bash
+rename getAppName --targets ios,android,macos,windows,linux
+```
+
+### Check/List Dependencies:
+```bash
+dart pub deps
+```
+
+### Remove Dependency/Package:
+```bash
+dart pub remove change_app_package_name
+```
+
+### Run the command again to also generate an app icon for the web app:
+```bash
+dart run flutter_launcher_icons:main
+```
+
 
 com.kaibacorp.streetvybezgpt:
 > Task :app:signingReport
