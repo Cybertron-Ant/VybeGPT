@@ -1,0 +1,93 @@
+name: Build Flutter App And Web
+
+on:
+  push:  # Trigger workflow on push to any branch
+  pull_request:  # Trigger workflow on pull request to any branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Step 4: Check Flutter environment
+      - name: Check Flutter environment
+        run: flutter doctor -v
+
+      # Step 5: Ensure app directory exists
+      - name: Ensure app directory exists
+        run: mkdir -p $HOME/towers/android/app/
+
+      # Step 6: Decode keystore
+      - name: Decode keystore
+        run: |
+          echo "Decoding keystore..."
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > $HOME/towers/android/app/streetvybezgptkeystore.jks
+          ls -l $HOME/towers/android/app/
+
+      # Step 7: Log Environment Variables
+      - name: Log Environment Variables
+        run: |
+          echo "STORE_FILE: $HOME/towers/android/app/streetvybezgptkeystore.jks"
+          echo "KEY_ALIAS: ${{ secrets.KEY_ALIAS }}"
+          echo "KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}"
+          echo "STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}"
+
+      # Step 8: Check if Keystore Exists
+      - name: Check if Keystore Exists
+        run: |
+          if [ -f "$HOME/towers/android/app/streetvybezgptkeystore.jks" ]; then
+            echo "Keystore exists."
+          else
+            echo "Keystore does NOT exist."
+            exit 1  # Exit with error if keystore is missing
+          fi
+
+      # Step 9: Clean Flutter Project
+      - name: Clean Flutter Project
+        run: flutter clean
+
+      # Step 10: Build Flutter APK
+      - name: Build Flutter APK
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          MODEL_VERSION: ${{ secrets.MODEL_VERSION }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          STORE_FILE: /home/runner/towers/android/app/streetvybezgptkeystore.jks  # Use absolute path
+        run: flutter build apk --release
+
+      # Step 11: Upload APK Artifact
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      # Step 12: Build Flutter Web App
+      - name: Build Flutter Web App
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          MODEL_VERSION: ${{ secrets.MODEL_VERSION }}
+        run: flutter build web --release
+
+      # Step 13: upload the web app as an artifact
+      - name: Upload Web Build Artifact
+        uses: actions/upload-artifact@v3  # Uploads the build artifacts.
+        with:
+          name: web-app-build  # Name for the artifact.
+          path: build/web  # Path to the web build folder where the web files are generated.

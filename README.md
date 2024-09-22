@@ -889,6 +889,150 @@ dart run flutter_native_splash:create
 ```
 
 
+## Add Keystore to GitHub Secrets
+
+Since you cannot directly include sensitive files in your repository, you should add your keystore file as a GitHub Secret.
+
+## Convert Your Keystore File to a Base64 String
+
+Run the following command to convert your keystore file to a base64 string:
+
+```bash
+base64 /home/user/towers/lib/streetvybezgpt/streetvybezgptkeystore.jks > keystore.txt
+```
+
+1. Copy the contents of `keystore.txt`.
+
+2. In your GitHub repository, go to **Settings** > **Secrets and variables** > **Actions** > **New repository secret**.
+   - Name it something like `ANDROID_KEYSTORE` and paste the base64 string.
+
+## Modify Your GitHub Actions Workflow
+
+Update your GitHub Actions workflow YAML file to decode the secret back into a file before building. This will ensure your keystore is used during the APK build process.
+
+## Summary
+
+- **Add Your Keystore to Secrets**: Make sure to encode your keystore file to base64 and store it as a secret named `ANDROID_KEYSTORE` in your GitHub repository.
+
+- **Store Passwords and Aliases**: Ensure that `KEY_ALIAS`, `KEY_PASSWORD`, and `STORE_PASSWORD` secrets are also set up in your GitHub repository for signing the APK.
+
+- **Test the Workflow**: After pushing your changes, monitor the **Actions** tab to see if the build completes successfully.
+
+
+# Build Flutter App with GitHub Actions
+
+This guide provides instructions on how to set up continuous integration (CI) for a Flutter project using GitHub Actions. The workflow will build the Flutter APK and web app on each push or pull request to a specific branch.
+
+## Workflow Configuration
+
+The GitHub Actions workflow defined below performs the following tasks:
+
+1. **Check out the repository**: Uses the latest code from the repository.
+2. **Set up Flutter**: Installs the specified Flutter version.
+3. **Install dependencies**: Fetches the Flutter project's dependencies.
+4. **Check the Flutter environment**: Verifies the setup with `flutter doctor`.
+5. **Print environment variables**: Displays sensitive environment information like the `KEY_ALIAS` and `STORE_FILE`.
+6. **Clean the Flutter project**: Cleans up the project before building.
+7. **Build the Flutter APK**: Builds the Android APK in release mode.
+8. **Build the Flutter web app**: Builds the web version of the Flutter app in release mode.
+
+## Prerequisites
+
+- Ensure you have the following Flutter version specified: `3.22.2`
+- Add the following secrets in your GitHub repository for secure builds:
+  - `API_KEY`
+  - `MODEL_VERSION`
+  - `KEY_ALIAS`
+  - `KEY_PASSWORD`
+  - `STORE_PASSWORD`
+  - `STORE_FILE`
+
+## GitHub Actions Workflow
+
+Here is the full workflow configuration file:
+
+```yaml
+name: Build Flutter App
+
+on:
+  push:
+    branches:
+      - '#78_StreetVybezGPT(login_ai-tool-IDX-Cloud9)'
+  pull_request:
+    branches:
+      - '#78_StreetVybezGPT(login_ai-tool-IDX-Cloud9)'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check Flutter environment
+        run: flutter doctor -v
+
+      - name: Print Environment Variables
+        run: |
+          echo "KEY_ALIAS: ${{ secrets.KEY_ALIAS }}"
+          echo "STORE_FILE: ${{ secrets.STORE_FILE }}"
+
+      - name: Clean Flutter Project
+        run: flutter clean
+
+      - name: Build Flutter APK
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          MODEL_VERSION: ${{ secrets.MODEL_VERSION }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          STORE_FILE: ${{ secrets.STORE_FILE }}
+        run: flutter build apk --release
+
+      - name: Build Flutter Web App
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          MODEL_VERSION: ${{ secrets.MODEL_VERSION }}
+        run: flutter build web --release
+```
+
+## How to Use
+
+### 1. Create a GitHub Actions Workflow:
+Create a `.github/workflows/build.yml` file in your repository and paste the workflow YAML content from the previous section.
+
+### 2. Configure Secrets:
+Go to your repository's **Settings > Secrets** and add the required secrets (`API_KEY`, `MODEL_VERSION`, etc.).
+
+### 3. Trigger Workflow:
+The workflow will automatically be triggered on every push or pull request to the branch `#78_StreetVybezGPT(login_ai-tool-IDX-Cloud9)`.
+
+### 4. Monitor Build:
+You can monitor the workflow's progress under the **Actions** tab in your GitHub repository.
+
+## Key Notes
+
+- Ensure your Flutter project is fully prepared for production, particularly with the keystore setup for signing APKs.
+- Modify the branch name in the workflow (`#78_StreetVybezGPT(login_ai-tool-IDX-Cloud9)`) if you're using a different branch.
+- This workflow uses **Ubuntu** as the build environment. You can customize it for other environments as needed.
+
+## Troubleshooting
+
+- **Missing secrets**: Ensure that all necessary secrets are correctly added to your GitHub repository.
+- **Flutter version mismatch**: Confirm that the specified Flutter version (`3.22.2`) is compatible with your project.
+
+
+
 com.kaibacorp.streetvybezgpt:
 > Task :app:signingReport
 Variant: debug
