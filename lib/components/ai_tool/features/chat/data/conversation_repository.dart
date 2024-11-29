@@ -148,49 +148,83 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
 
   }  // end of 'updateConversationTitle' method
 
-  // method to load conversations with pagination
-  // this returns a list of conversations for a user with support for pagination
-  Future<List<Conversation>> loadConversations(String userEmail, {int offset = 0, int limit = 15}) async {
+  /// Loads conversations for a given user with pagination support
+  /// [userEmail] can be null, in which case an empty list is returned
+  /// [offset] determines the starting point for pagination (default: 0)
+  /// [limit] determines the maximum number of conversations to load (default: 15)
+  /// Returns a List of Conversation objects, or empty list if there's an error
+  Future<List<Conversation>> loadConversations(String? userEmail,
+      {int offset = 0, int limit = 15}) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      // Safety check: Return empty list if no valid user email
+      if (userEmail == null || userEmail.isEmpty) {
+        debugPrint('Warning: Attempted to load conversations with null/empty email');
+        return [];
+      }
 
-      if (offset > 0) {
-        final lastDocument = await _getLastDocument(userEmail, offset);
+      // Ensure limit is positive
+      if (limit <= 0) {
+        debugPrint('Warning: Invalid limit ($limit). Using default limit of 15');
+        limit = 15;
+      }
+
+      // Ensure offset is non-negative
+      if (offset < 0) {
+        debugPrint('Warning: Invalid offset ($offset). Using 0');
+        offset = 0;
+      }
+
+      QuerySnapshot querySnapshot;
+      // Get the last document for pagination
+      final lastDocument = await _getLastDocument(userEmail, offset);
+
+      // If we have a last document and offset > 0, start after it for pagination
+      if (lastDocument != null && offset > 0) {
         querySnapshot = await _firestore
             .collection('users')  // Firestore collection for users
             .doc(userEmail)  // document for specific user
             .collection('conversations')  // subcollection for conversations
-            .orderBy('lastModified', descending: true)  // order conversations by 'lastModified' in descending order
+            .orderBy('lastModified', descending: true)  // Most recent conversation(s) first
             .startAfterDocument(lastDocument)  // pagination start
             .limit(limit)  // limit the number of conversations loaded
             .get();  // get conversations for user with pagination
       } else {
+        // First page or no previous documents
         querySnapshot = await _firestore
-            .collection('users')  // Firestore collection for users
+            .collection('users')// collection for users
             .doc(userEmail)  // document for specific user
-            .collection('conversations')  // subcollection for conversations
-            .orderBy('lastModified', descending: true)  // order conversations by 'lastModified' in descending order
-            .limit(limit)  // limit the number of conversations loaded
-            .get();  // get conversations for user with pagination
-      }
+            .collection('conversations')
+            .orderBy('lastModified', descending: true)
+            .limit(limit)
+            .get();
+      }// end 'else'
 
-      return querySnapshot.docs.map((doc) => Conversation.fromDocument(doc)).toList();  // map query result to conversation list
-
+      try {
+        // Convert Firestore documents to Conversation objects
+        return querySnapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return Conversation.fromMap(doc.id, data);
+        }).toList();
+      } catch (conversionError) {
+        // Log document conversion error and return empty list
+        debugPrint('Error converting conversation documents: $conversionError');
+        return [];
+      }// end 'catch'
     } catch (e) {
-
-      if (kDebugMode) {
-        print('Error loading conversations: $e');
-      }  // log error if loading fails
-
-      rethrow;  // rethrow exception to be handled by the caller
-
-    } // end 'CATCH'
-
-  }  // end of 'loadConversations' method
+      // Log error and return empty list instead of rethrowing
+      debugPrint('Error loading conversations: $e');
+      return [];
+    }// end 'catch'
+  } // end of 'loadConversations' method
 
   // helper method to get the last document for pagination
   // this method fetches the last document based on offset
-  Future<DocumentSnapshot<Map<String, dynamic>>> _getLastDocument(String userEmail, int offset) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>?> _getLastDocument(String userEmail, int offset) async {
+    // If offset is 0, return null as we don't need a last document for the first page
+    if (offset <= 0) {
+      return null;
+    }
+
     final querySnapshot = await _firestore
         .collection('users')  // Firestore collection for users
         .doc(userEmail)  // document for specific user
@@ -199,9 +233,12 @@ class ConversationRepository extends ChangeNotifier {  // repository class for m
         .limit(offset)  // limit to the offset value
         .get();  // get the last document for pagination
 
-    return querySnapshot.docs.last;  // return the last document snapshot
+    if (querySnapshot.docs.isEmpty) {
+      return null;
+    }
 
-  }  // end of '_getLastDocument' helper method
+    return querySnapshot.docs.last;  // return the last document snapshot
+  } // end of '_getLastDocument' helper method
 
   // method to delete a conversation
   Future<void> deleteConversation(String userEmail, String conversationId) async {

@@ -4,33 +4,48 @@ import 'package:provider/provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/login_system/constants/assets.dart';
 
-/// A stateless widget that represents a button for Google Sign-In.
+/// A stateful widget that represents a button for Google Sign-In.
 /// This button depends on [GoogleSignInProvider] to work.
-class GoogleSignInButton extends StatelessWidget {
+class GoogleSignInButton extends StatefulWidget {
 
   /// The landing page widget to navigate to after a successful sign-in.
   final Widget landingPage;
 
-  /// Creates a [GoogleSignInButton] widget.
-  GoogleSignInButton({super.key, required this.landingPage});
+  const GoogleSignInButton({super.key, required this.landingPage});
+
+  @override
+  State<GoogleSignInButton> createState() => _GoogleSignInButtonState();
+}
+
+class _GoogleSignInButtonState extends State<GoogleSignInButton> {
+  bool _isLoading = false;
 
   /// Handles the sign-in process when the button is clicked.
-  /// Uses the [GoogleSignInProvider] to sign in the user with Google. If the sign-in
-  /// is successful and the context is still valid, it navigates to the [landingPage].
-  void _signInWithGoogle(BuildContext context) async {
+  Future<void> _signInWithGoogle(BuildContext context) async {
+    if (_isLoading) return;
 
-    // attempt to sign in the user with Google.
-    final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
-    User? user = await googleSignInProvider.signInWithGoogle(context);
+    setState(() {
+      _isLoading = true;
+    });
 
-    // if the sign-in is successful & the context is valid, navigate to [landingPage].
-    if (user != null && context.mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => landingPage,
-        ),
-      );
+    try {
+      final googleSignInProvider = Provider.of<GoogleSignInProvider>(context, listen: false);
+      User? user = await googleSignInProvider.signInWithGoogle(context);
+
+      if (user != null && context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => widget.landingPage,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -39,7 +54,7 @@ class GoogleSignInButton extends StatelessWidget {
 
     // build the Google Sign-In button with styling similar to the LoginPage button
     return MaterialButton(
-      onPressed: () => _signInWithGoogle(context),
+      onPressed: _isLoading ? null : () => _signInWithGoogle(context),
 
       color: Colors.white, // Background color for the button.
       elevation: 5.0, // Elevation for a shadow effect.
@@ -54,17 +69,27 @@ class GoogleSignInButton extends StatelessWidget {
 
         children: <Widget>[
 
-          Image.asset(
-            Assets.googleLogo, // google logo asset
-            height: 24, // google logo height
-          ),
+          if (_isLoading)
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+              ),
+            )
+          else
+            Image.asset(
+              Assets.googleLogo, // google logo asset
+              height: 24, // google logo height
+            ),
 
           const SizedBox(width: 10.0), // space between the logo & text
 
-          const Text(
-            'Sign in with Google',
+          Text(
+            _isLoading ? 'Signing in...' : 'Sign in with Google',
 
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16.0, // Font size for the text
               color: Colors.black54, // Text color
             ),
