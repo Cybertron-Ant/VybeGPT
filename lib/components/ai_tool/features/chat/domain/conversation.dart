@@ -23,20 +23,29 @@ class Conversation {  // class representing a conversation
     return {
       'title': title,  // title of the conversation
       'messages': messages,  // list of messages in the conversation
-      'createdAt': createdAt.toIso8601String(),  // creation timestamp in ISO 8601 format
-      'lastModified': lastModified.toIso8601String(),  // last modified timestamp in ISO 8601 format
+      'createdAt': Timestamp.fromDate(createdAt),  // store as Firestore Timestamp
+      'lastModified': Timestamp.fromDate(lastModified),  // store as Firestore Timestamp
     };
   }  // end of 'toMap' method
 
   // create a 'Conversation' object from a map fetched from Firestore
   factory Conversation.fromMap(String id, Map<String, dynamic> map) {
+    // Helper function to handle different timestamp formats
+    DateTime getDateTime(dynamic value) {
+      if (value is Timestamp) {
+        return value.toDate();  // convert Firestore Timestamp to DateTime
+      } else if (value is String) {
+        return DateTime.parse(value);  // parse ISO 8601 string to DateTime
+      }
+      return DateTime.now();  // fallback to current time if format is invalid
+    }
 
     return Conversation(
       id: id,  // unique identifier of the conversation
-      title: map['title'],  // title of the conversation
-      messages: List<String>.from(map['messages']),  // list of messages in the conversation
-      createdAt: DateTime.parse(map['createdAt']),  // creation timestamp parsed from string
-      lastModified: DateTime.parse(map['lastModified']),  // last modified timestamp parsed from string
+      title: map['title'] ?? '',  // title of the conversation (default to empty if null)
+      messages: List<String>.from(map['messages'] ?? []),  // list of messages (default to empty if null)
+      createdAt: getDateTime(map['createdAt']),  // handle both Timestamp and String formats
+      lastModified: getDateTime(map['lastModified']),  // handle both Timestamp and String formats
     );
 
   }  // end of 'fromMap' factory constructor
@@ -45,17 +54,7 @@ class Conversation {  // class representing a conversation
   factory Conversation.fromDocument(DocumentSnapshot doc) {
 
     final data = doc.data() as Map<String, dynamic>;  // extract data from document snapshot
-    return Conversation(
-      id: doc.id,  // unique identifier of the document
-      title: data['title'] ?? '',  // title of the conversation (default to empty string if null)
-      messages: List<String>.from(data['messages'] ?? []),  // list of messages (default to empty list if null)
-      createdAt: data['createdAt'] is Timestamp
-          ? (data['createdAt'] as Timestamp).toDate()  // handle Timestamp & convert to DateTime
-          : DateTime.now(),  // default to current time if data is null or not a Timestamp
-      lastModified: data['lastModified'] is Timestamp
-          ? (data['lastModified'] as Timestamp).toDate()  // handle Timestamp & convert to DateTime
-          : DateTime.now(),  // default to current time if data is null or not a Timestamp
-    );
+    return Conversation.fromMap(doc.id, data);  // use fromMap to handle the conversion
 
   }  // end of 'fromDocument' factory constructor
 

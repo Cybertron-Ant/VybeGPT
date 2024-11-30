@@ -9,14 +9,14 @@ import 'package:towers/components/facebook_sign_in/providers/facebook_user_provi
 import 'package:towers/components/google_sign_in/providers/google_sign_in_provider.dart';
 import 'package:towers/components/google_sign_in/providers/google_user_provider.dart';
 import 'package:towers/components/login_system/user_authentication/log_out/providers/log_out_provider.dart';
-import 'components/login_system/database_initialization/firebase_init.dart';
-import 'components/login_system/database_initialization/widgets/error_app.dart';
-import 'components/my_app.dart';
-import 'components/ai_tool/features/chat/domain/response_generation_service.dart'; // Ensure correct import path
-import 'components/ai_tool/features/chat/domain/conversation_service.dart'; // Ensure correct import path
-import 'components/ai_tool/features/chat/data/ai_repository.dart'; // Ensure correct import path
-import 'components/ai_tool/features/chat/data/conversation_repository.dart'; // Ensure correct import path
-import 'components/ai_tool/features/chat/controllers/chat_controller.dart'; // Ensure correct import path
+import 'package:towers/components/login_system/database_initialization/firebase_init.dart';
+import 'package:towers/components/login_system/database_initialization/widgets/error_app.dart';
+import 'package:towers/components/my_app.dart';
+import 'package:towers/components/ai_tool/features/chat/domain/response_generation_service.dart';
+import 'package:towers/components/ai_tool/features/chat/domain/conversation_service.dart';
+import 'package:towers/components/ai_tool/features/chat/data/ai_repository.dart';
+import 'package:towers/components/ai_tool/features/chat/data/conversation_repository.dart';
+import 'package:towers/components/ai_tool/features/chat/controllers/chat_controller.dart';
 
 // 'MaterialApp' widget as the root
 // the 'Firebase' initialization should be completed before running the app
