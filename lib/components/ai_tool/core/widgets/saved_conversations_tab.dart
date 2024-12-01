@@ -47,47 +47,12 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
         }
       });
     _searchController.addListener(_filterConversations); // add listener for search input
-  
-   if (context.mounted) {
-      _loadInitialConversations(); // load initial conversations when the widget is mounted
-    }
-    _conversations = widget.conversations; // initialize conversations from the passed argument
+
+    // Initialize conversations with the provided list and sort them
+    _conversations = List.from(widget.conversations)
+      ..sort((a, b) => b.lastModified.compareTo(a.lastModified));
     _filteredConversations = _conversations; // initialize filtered conversations
-  } // end 'initState' method
-
-  Future<void> _loadInitialConversations() async {
-    if (_isLoading) return;  // return if already loading
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final initialConversations = await _conversationRepository.loadConversations(
-        widget.userEmail,
-        offset: _offset,
-        limit: _limit,
-      );
-      if (_isMounted) { // check if the widget is still mounted
-        setState(() {
-          _conversations = initialConversations;
-          _filteredConversations = _conversations; // initialize filtered list
-          _offset += initialConversations.length;
-          _hasMore = initialConversations.length == _limit;  // if fewer conversations returned, no more data
-        });
-      }
-    } catch (e) {
-      // handle error (if needed)
-      if (kDebugMode) {
-        print('Error loading initial conversations: $e');
-      }
-    } finally {
-      if (_isMounted) { // check if the widget is still mounted
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+    _offset = _conversations.length; // Set initial offset to current list length
   }
 
   Future<void> _loadMoreConversations() async {
@@ -105,8 +70,13 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
       );
       if (_isMounted) { // check if the widget is still mounted
         setState(() {
-          _conversations.addAll(newConversations);
-          _filteredConversations = _conversations; // update filtered list
+          // Use a Set to avoid duplicates when adding new conversations
+          final existingIds = _conversations.map((c) => c.id).toSet();
+          final uniqueNewConversations = newConversations.where((c) => !existingIds.contains(c.id));
+          
+          _conversations.addAll(uniqueNewConversations);
+          _conversations.sort((a, b) => b.lastModified.compareTo(a.lastModified));
+          _filterConversations(); // update filtered list with search query
           _offset += newConversations.length;
           _hasMore = newConversations.length == _limit;  // if fewer conversations returned, no more data
         });
@@ -131,7 +101,8 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
     setState(() {
       _filteredConversations = _conversations.where((conversation) {
         return conversation.title.toLowerCase().contains(query);
-      }).toList();
+      }).toList()
+        ..sort((a, b) => b.lastModified.compareTo(a.lastModified)); // Sort filtered results
     });
   } // end '_filterConversations' method
 
@@ -140,11 +111,39 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
     _filterConversations(); // reset the filtered list
   }
 
-  void _refreshConversations() {
-    _offset = 0; // reset the offset for loading from the beginning
-    _conversations = []; // clear the current list of conversations
-    _filteredConversations = []; // clear filtered list
-    _loadInitialConversations(); // reload the conversations
+  Future<void> _refreshConversations() async {
+    setState(() {
+      _offset = 0; // reset the offset for loading from the beginning
+      _isLoading = true; // set loading state
+    });
+
+    try {
+      final conversations = await _conversationRepository.loadConversations(
+        widget.userEmail,
+        offset: 0,
+        limit: _limit,
+      );
+
+      if (_isMounted) {
+        setState(() {
+          _conversations = conversations;
+          _conversations.sort((a, b) => b.lastModified.compareTo(a.lastModified));
+          _filterConversations();
+          _offset = conversations.length;
+          _hasMore = conversations.length == _limit;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error refreshing conversations: $e');
+      }
+      if (_isMounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -195,7 +194,6 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
               
                 child: TextField(
                   controller: _searchController,
-             
                   decoration: InputDecoration(
                     labelText: 'Search Conversations',
                     border: const OutlineInputBorder(),
@@ -215,9 +213,8 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
                 controller: _scrollController,
                 itemCount: _filteredConversations.length + 1,  // number of items in the list + 1 for the loading indicator
                 itemBuilder: (context, index) {
-                  
+                   // show a loading indicator at the end of the list
                   if (index == _filteredConversations.length) {
-                    // show a loading indicator at the end of the list
                     return _isLoading
                         ? const Padding(
                             padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -232,16 +229,15 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
                     padding: const EdgeInsets.fromLTRB(2.0, 2.5, 2.0, 2.5,),
                     
                     child: ListTile(
-                      
+                       // display only the first 50 characters & add an ellipsis if needed
                       title: Text(
-                        // display only the first 50 characters & add an ellipsis if needed
                         conversation.title.length > 50
                             ? '${conversation.title.substring(0, 50)}...'  // truncate & add ellipsis
                             : conversation.title,  // full title
                         overflow: TextOverflow.ellipsis,  // ensure ellipsis if text overflows
                         maxLines: 1,  // limit text to one line
                       ),
-                     
+                      // subtitle: Text(conversation.lastModified.toString()), // display last modified timestamp
                       subtitle: const Text(""),
                       
                       onTap: () {
@@ -272,7 +268,6 @@ class _SavedConversationsTabState extends State<SavedConversationsTab> {
                           _refreshConversations();
                         });
                       }, // end 'onLongPress'
-                   
                     ),
                   );
                 }, // end 'itemBuilder'
