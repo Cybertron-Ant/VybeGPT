@@ -307,6 +307,143 @@ Future<List<Conversation>> loadConversations(String? userEmail,
 - Implements graceful degradation
 - Uses proper logging"
 
+## Monetization Strategy (5 minutes)
+
+"Let me share how we can transform StreetVybezGPT into a sustainable business while maintaining a great user experience. I've designed the architecture to easily accommodate these monetization features:"
+
+### 1. Freemium Model Implementation
+
+```dart
+// lib/components/ai_tool/features/subscription/models/subscription_tier.dart
+enum SubscriptionTier {
+  free,
+  premium,
+  enterprise;
+
+  Map<String, dynamic> get features {
+    switch (this) {
+      case SubscriptionTier.free:
+        return {
+          'messagesPerDay': 20,
+          'customBackgrounds': false,
+          'advancedAI': false,
+          'priority': false,
+        };
+      case SubscriptionTier.premium:
+        return {
+          'messagesPerDay': 100,
+          'customBackgrounds': true,
+          'advancedAI': true,
+          'priority': false,
+        };
+      case SubscriptionTier.enterprise:
+        return {
+          'messagesPerDay': double.infinity,
+          'customBackgrounds': true,
+          'advancedAI': true,
+          'priority': true,
+        };
+    }
+  }
+}
+```
+
+"The subscription system would offer:
+- Free Tier: Basic chat with daily limits
+- Premium Tier: More messages, custom themes, advanced AI features
+- Enterprise Tier: Unlimited usage, priority support, custom integrations
+
+### 2. In-App Purchases
+
+```dart
+// lib/components/ai_tool/features/store/models/purchasable_item.dart
+class PurchasableItem {
+  final String id;
+  final String name;
+  final double price;
+  final ItemType type;
+  final Map<String, dynamic> features;
+
+  // Examples:
+  static final messagePackSmall = PurchasableItem(
+    id: 'msg_pack_50',
+    name: '50 Extra Messages',
+    price: 4.99,
+    type: ItemType.consumable,
+  );
+  
+  static final customThemePack = PurchasableItem(
+    id: 'theme_pack_1',
+    name: 'Premium Themes Pack',
+    price: 2.99,
+    type: ItemType.nonConsumable,
+  );
+}
+```
+
+"We can offer:
+- Message Packs: Extra messages beyond daily limits
+- Theme Packs: Custom UI themes and animations
+- Special AI Models: Access to specialized AI capabilities
+- Priority Features: Faster response times, offline mode
+
+### 3. Integration with Payment Systems
+
+```dart
+// lib/components/ai_tool/features/payments/services/payment_service.dart
+class PaymentService {
+  Future<bool> processSubscription(SubscriptionTier tier) async {
+    // Integration with payment providers
+    // - Stripe for global payments
+    // - Local payment methods for different regions
+    // - In-app purchase APIs for mobile stores
+  }
+
+  Future<bool> processOneTimePayment(PurchasableItem item) async {
+    // Handle one-time purchases
+    // - Virtual items
+    // - Feature unlocks
+    // - Message packs
+  }
+}
+```
+
+### 4. Analytics and Metrics
+
+```dart
+// lib/components/ai_tool/core/analytics/usage_metrics.dart
+class UsageMetrics {
+  Future<Map<String, dynamic>> trackUserEngagement() async {
+    return {
+      'dailyActiveUsers': _getDailyActiveUsers(),
+      'messagesSent': _getMessageCount(),
+      'subscriptionConversion': _getConversionRate(),
+      'popularFeatures': _getFeatureUsage(),
+    };
+  }
+}
+```
+
+"This helps us:
+- Understand user behavior
+- Optimize pricing strategies
+- Identify popular features
+- Guide product development
+
+### 5. User Experience Considerations
+
+- Transparent pricing and feature limits
+- Seamless upgrade flow
+- Non-intrusive premium feature promotion
+- Value demonstration through feature previews
+- Regular content and feature updates
+
+The modular architecture I've built makes it easy to:
+1. Add new monetization features
+2. A/B test different pricing strategies
+3. Integrate with various payment providers
+4. Scale based on user demand"
+
 ## Bringing It All Together
 
 So that's how StreetVybezGPT works under the hood. From the clean architecture that keeps our code organized, through the smart controllers that manage our application state, to the AI integration that powers our conversations - every piece works together to create a seamless chat experience.

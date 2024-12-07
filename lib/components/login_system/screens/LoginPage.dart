@@ -194,27 +194,38 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     );
                                   },
-                                  
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center, // center row children
-                                    
-                                    children: <Widget>[
-                                      Text(
-                                        Strings.dontHaveAccount, // text for no account
-                                        style: TextStyle(color: AppColors.black), // text color
-                                      ),
-                                      
-                                      Text(
-                                        Strings.createAccount, // text for create account
-                                        style: TextStyle(
-                                          color: AppColors.indigo,
-                                          fontWeight: FontWeight.bold, // bold text
-                                          decoration: TextDecoration.underline, // underline text
+                                  child: const Flexible(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center, // center row children
+                                      mainAxisSize: MainAxisSize.min,
+
+                                      children: <Widget>[
+
+                                        Flexible(
+                                          child: Text(
+                                            Strings.dontHaveAccount, // text for no account
+                                            style: TextStyle(color: AppColors.black), // text color
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ),
-                                      
-                                    ],
-                                    
+
+                                        SizedBox(width: 4),
+
+                                        Flexible(
+                                          child: Text(
+                                            Strings.createAccount, // text for create account
+                                            style: TextStyle(
+                                              color: AppColors.indigo,
+                                              fontWeight: FontWeight.bold, // bold text
+                                              decoration: TextDecoration.underline, // underline text
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+
+                                      ],
+
+                                    ),
                                   ),
                                 ),
                                 
